@@ -1,1 +1,1 @@
-# GRAFMOVE-Graph-based-Mobility-Optimization-and-Visualization-Engine
+# GRAFMOVE: Graph-based Mobility Optimization and Visualization Engine
