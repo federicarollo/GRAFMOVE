@@ -13,25 +13,32 @@ dbms.security.procedures.unrestricted=jwt.security.\*,apoc.\*,gds.\*,**spatial.\
 ## Graph creation and integration of additional data
 
 To create the graph:
+
 `python graph/**create_footpath_graph.py** --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
+
 where *lat* and *lot* are the latitude and longitude of th center point, while *dist* is the distance from the center point to define the bounding box
 
 Example to create the graph of Modena:
+
 `python graph/create_footpath_graph.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude 44.645885 --longitude 10.9255707 --distance 5000`
 
 
 To add amenities (restaurants, shops, squares and tourist attractions) in the graph:
+
 `python graph/**add_amenity.py** --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
 
 
 To integrate green areas in the graph:
+
 `python graph/integrate_green_area.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
 
 
 ## Routing
 
 To find the best path between a set of points:
+
 `python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --weight weight --points points`
+
 where *weight* is the routing cost function to optimize (e.g., *distance* or *green_area_weight*) and *points* is a list of space-separated OpenStreetMap identifiers of the FootNode nodes of the graph.
 
 The script will return:
@@ -43,11 +50,14 @@ If *points='bbox'* then you need to specify the parameters *latitude_min*, *lati
 In these cases, the script will return also the file with the list of amenities and the nearest FootNode node.
 
 Example to find the best paths between all the amenities in the city center of Modena:
+
 `python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --points bbox --latitude_min 44.640049 --latitude_max 44.652324 --longitude_min 10.917066 --longitude_max 10.934938 --weight distance`
 
 
 To solve the Traveling Salesperson Problem (TSP), i.e., to identify the best path to visit a set of points once and only once:
+
 `python routing/tsp.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd neo4jpwd --points points`
+
 where *points* is the sequence of space-separated OpenStreetMap identifiers of the FootNode nodes of the points to visit.
 
 If no value is specified for *points*, N points are selected randomly from the FootNode nodes near the amenities. The default number of points is 5, but this number can be modified through the *num_points* parameter.
