@@ -79,9 +79,9 @@ class Amenity:
                                 MATCH (p:OSMNode)
                                 WITH p
                                 MATCH (n:FootNode)
-                                WHERE point.distance(n.geometry, p.geometry) < 50
+                                WHERE point.distance(n.location, p.location) < 100
                                 MERGE (p)-[r:NEAR]->(n)
-                                ON CREATE SET r.distance = point.distance(n.geometry, p.geometry)
+                                ON CREATE SET r.distance = point.distance(n.location, p.location)
                                 """)
             return result.values()
 
@@ -93,6 +93,14 @@ class Amenity:
                                 """)
             result = session.run("""
                                    CREATE INDEX FOR (n:OSMNode) ON (n.osm_id)
+                                """)
+            return result.values()
+
+    def set_location(self, conn):
+        """create index on nodes"""
+        with conn.driver.session() as session:
+            result = session.run("""
+                                   MATCH (c:OSMNode) SET c.location = point({latitude: c.lat, longitude: c.lon, srid:4326})
                                 """)
             return result.values()
 
@@ -193,6 +201,8 @@ def main(args=None):
     
     
     amenity.import_nodes_into_spatial_layer(neo4jconn)
+    
+    amenity.set_location(neo4jconn)
     
     # amenity.set_index(neo4jconn)
 
