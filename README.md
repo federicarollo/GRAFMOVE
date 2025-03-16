@@ -14,7 +14,7 @@ dbms.security.procedures.unrestricted=jwt.security.\*,apoc.\*,gds.\*,**spatial.\
 
 To create the graph:
 
-`python graph/**create_footpath_graph.py** --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
+`python graph/create_footpath_graph.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude lat --longitude lon --distance dist`
 
 where *lat* and *lot* are the latitude and longitude of th center point, while *dist* is the distance from the center point to define the bounding box
 
@@ -25,12 +25,12 @@ Example to create the graph of Modena:
 
 To add amenities (restaurants, shops, squares and tourist attractions) in the graph:
 
-`python graph/**add_amenity.py** --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
+`python graph/add_amenity.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude lat --longitude lon --distance dist`
 
 
 To integrate green areas in the graph:
 
-`python graph/integrate_green_area.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
+`python graph/integrate_green_area.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude lat --longitude lon --distance dist`
 
 
 ## Routing
