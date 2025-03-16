@@ -8,12 +8,8 @@ from neo4j import GraphDatabase
 from utils.db_utils import Neo4jConnection
 
 class FootPathGraph:
-    # def __init__(self, uri, user, password):
-    #     self.driver = GraphDatabase.driver(uri, auth=(user, password))
-
 
     def create_graph(self, conn, file):
-        """create the graph from the .graphml file"""
         with conn.driver.session() as session:
             result = session.run("""
                             CALL apoc.import.graphml($file, {storeNodeIds: true, defaultRelationshipType: 'ROUTE', readLabels: true, batchSize: 10000});
@@ -21,57 +17,59 @@ class FootPathGraph:
             return result.values()
 
     def set_label(self, conn):
-        """set the Node lable to nodes"""
         with conn.driver.session() as session:
             result = session.run("""
-                                MATCH (n) SET n:FootNode;
+                                CALL apoc.periodic.iterate(
+                                  "MATCH (n) RETURN n",
+                                  "SET n:FootNode", 
+                                  {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;
                                 """)
             return result.values()
 
-    CALL apoc.periodic.iterate(
-      "MATCH (n) RETURN n",
-      "SET n:FootNode", 
-      {batchSize:1000, iterateList:true}
-    )
-    YIELD batches, total
-    RETURN batches, total;
+    
 
     def set_location(self, conn):
-        """insert the location in the node attributes"""
         with conn.driver.session() as session:
+            # result = session.run("""
+            #                     MATCH (n:FootNode) SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x)}),
+            #                     n.lat = tofloat(n.y), 
+            #                     n.lon = tofloat(n.x),
+            #                     n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')';
+            #                     """)
+
             result = session.run("""
-                                MATCH (n:FootNode) SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x)}),
-                                n.lat = tofloat(n.y), 
-                                n.lon = tofloat(n.x),
-                                n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')';
+                                CALL apoc.periodic.iterate(
+                                  "MATCH (n) RETURN n",
+                                  "SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x)}), n.lat = tofloat(n.y), n.lon = tofloat(n.x), n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')'", 
+                                  {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;
                                 """)
             return result.values()
-
-    # CALL apoc.periodic.iterate(
-    #   "MATCH (n) RETURN n",
-    #   "SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x)}), n.lat = tofloat(n.y), n.lon = tofloat(n.x), n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')'", 
-    #   {batchSize:1000, iterateList:true}
-    # )
-    # YIELD batches, total
-    # RETURN batches, total;
 
 
 
     def set_distance(self, conn):
         """insert the distance in the nodes' relationships."""
         with conn.driver.session() as session:
+            # result = session.run("""
+            #                        MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) SET r.distance=point.distance(n1.location, n2.location)
+            #                     """)
+            
             result = session.run("""
-                                   MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) SET r.distance=point.distance(n1.location, n2.location)
+                                    CALL apoc.periodic.iterate(
+                                    "MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) RETURN r, n1, n2",
+                                    "SET r.distance=point.distance(n1.location, n2.location)", 
+                                    {batchSize:1000, iterateList:true}
+                                    )
+                                    YIELD batches, total
+                                    RETURN batches, total;
                                 """)
             return result.values()
-
-    # CALL apoc.periodic.iterate(
-    # "MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) RETURN r, n1, n2",
-    # "SET r.distance=point.distance(n1.location, n2.location)", 
-    # {batchSize:1000, iterateList:true}
-    # )
-    # YIELD batches, total
-    # RETURN batches, total;
 
     # def set_edge_geometry(conn, graph):
     #     with conn.driver.session() as session:
@@ -79,7 +77,6 @@ class FootPathGraph:
     #     return result.values()
     
     def set_index(self, conn):
-        """create index on nodes"""
         with conn.driver.session() as session:
             result = session.run("""
                                     CREATE INDEX FOR (n:FootNode) ON (n.id)
@@ -87,7 +84,6 @@ class FootPathGraph:
             return result.values()       
      
     def import_nodes_in_spatial_layer(self, conn):
-        """insert the road junctions in the spatial layer of the project"""
         with conn.driver.session() as session:
             result = session.run("""
                                 match (n:FootNode)

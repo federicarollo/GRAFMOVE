@@ -118,11 +118,14 @@ def add_options():
                        help="""Insert the weight to optimize.""",
                        required=False, default="distance")
     parser.add_argument('--points', '-ps', dest='points', type=str,
-                       help="""Insert the osm identifier of the points to visit (the first is the origin and destination point)""",
+                       help="""Insert space-separated OSM identifiers of the FootNode nodes of the points to visit""",
                        required=False, default='random')
     parser.add_argument('--num_points', '-nps', dest='num_points', type=int,
                        help="""Insert the number of points to visit (only if points = random)""",
                        required=False, default=5)
+    parser.add_argument('--path_filename', '-pfn', dest='path_filename', type=str,
+                        help="""Insert the name of the file to write the paths (as sequence of FootNode nodes).""",
+                        required=False, default="tsp_paths.csv")
     parser.add_argument('--mapName', '-mn', dest='map_filename', type=str,
                        help="""Insert the name of the file containing the map with the computed path.""",
                        required=False, default='tsp_map.html')
@@ -150,13 +153,13 @@ def main(args=None):
             return 0
         
  
-    with neo4jconn.driver.session() as session:
-        query = """call gds.graph.project(
-        'subgraph_tsp', 
-        ['FootNode'], 
-        ['ROUTE'], 
-        {nodeProperties: ['lat', 'lon'], relationshipProperties: ['%s']})"""%(str(options.weight))
-        session.run(query)
+    # with neo4jconn.driver.session() as session:
+    #     query = """call gds.graph.project(
+    #     'subgraph_tsp', 
+    #     ['FootNode'], 
+    #     ['ROUTE'], 
+    #     {nodeProperties: ['lat', 'lon'], relationshipProperties: ['%s']})"""%(str(options.weight))
+    #     session.run(query)
     
     best_path = tsp.find_best_path(neo4jconn, points, options.weight)
     
@@ -168,6 +171,8 @@ def main(args=None):
     print("Total cost:" + str(cost))
     # print("Path:" + str(path))
     
+    with open(options.path_filename, "w") as f:
+        f.write(path)
     
     
     # coordinates = greeter.get_coordinates(final_path = str(final_path))
@@ -197,9 +202,9 @@ def main(args=None):
     print("Green area weight: " + str(green_area_weight))
 
 
-    with neo4jconn.driver.session() as session:
-        query = """CALL gds.graph.drop('subgraph_tsp')"""
-        session.run(query)
+    # with neo4jconn.driver.session() as session:
+    #     query = """CALL gds.graph.drop('subgraph_tsp')"""
+    #     session.run(query)
 
     neo4jconn.close_connection()
     

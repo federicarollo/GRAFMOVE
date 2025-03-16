@@ -132,13 +132,13 @@ def main(args=None):
     n_points = len(points)
     print("Number of points for routing: " + str(n_points))
     
-    with neo4jconn.driver.session() as session:
-        query = """call gds.graph.project(
-        'subgraph_routing', 
-        ['FootNode'], 
-        ['ROUTE'], 
-        {nodeProperties: ['lat', 'lon'], relationshipProperties: ['%s']})"""%(str(weight))
-        session.run(query)
+    # with neo4jconn.driver.session() as session:
+    #     query = """call gds.graph.project(
+    #     'subgraph_routing', 
+    #     ['FootNode'], 
+    #     ['ROUTE'], 
+    #     {nodeProperties: ['lat', 'lon'], relationshipProperties: ['%s']})"""%(str(weight))
+    #     session.run(query)
     
     weight_matrix = np.zeros([n_points, n_points])
     paths = []
@@ -167,9 +167,9 @@ def main(args=None):
     path_df = pd.DataFrame(paths)
     path_df.to_csv(pathFilename, index=False)
 
-    with neo4jconn.driver.session() as session:
-        query = """CALL gds.graph.drop('subgraph_routing')"""
-        session.run(query)
+    # with neo4jconn.driver.session() as session:
+    #     query = """CALL gds.graph.drop('subgraph_routing')"""
+    #     session.run(query)
 
     neo4jconn.close_connection()
     

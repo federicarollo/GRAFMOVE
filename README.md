@@ -2,78 +2,56 @@
 
 Create a local DBMS in Neo4j (v4.4.4) and install the plugins APOC (v4.4.0.3) and GDS (v2.0.0).
 
-Add this line in the settings to enable file import: *apoc.import.file.enabled=true*
+Add this line in the settings to enable file import:
+*apoc.import.file.enabled=true*
 
-Add [eo4j-spatial-0.28.1-neo4j-4.4.3-server-plugin.jar](https://github.com/neo4j-contrib/spatial/releases/download/0.28.1-neo4j-4.4.3/neo4j-spatial-0.28.1-neo4j-4.4.3-server-plugin.jar) in the plugin folder
+Add [neo4j-spatial-0.28.1-neo4j-4.4.3-server-plugin.jar](https://github.com/neo4j-contrib/spatial/releases/download/0.28.1-neo4j-4.4.3/neo4j-spatial-0.28.1-neo4j-4.4.3-server-plugin.jar) in the plugin folder
 and add this to settings:
 dbms.security.procedures.unrestricted=jwt.security.\*,apoc.\*,gds.\*,**spatial.\***
 
 
+## Graph creation and integration of additional data
+
+To create the graph:
+`python graph/**create_footpath_graph.py** --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
+where *lat* and *lot* are the latitude and longitude of th center point, while *dist* is the distance from the center point to define the bounding box
+
+Example to create the graph of Modena:
+`python graph/create_footpath_graph.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude 44.645885 --longitude 10.9255707 --distance 5000`
 
 
-Creating the graph:
-python graph/create_footpath_graph.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --latitude 44.645885 --longitude 10.9255707 --distance 5000
+To add amenities (restaurants, shops, squares and tourist attractions) in the graph:
+`python graph/**add_amenity.py** --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
 
 
-python graph/add_amenity.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --latitude 44.645885 --longitude 10.9255707 --distance 5000
+To integrate green areas in the graph:
+`python graph/integrate_green_area.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude *lat* --longitude *lon* --distance *dist*`
 
 
+## Routing
 
-python graph/integrate_green_area.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass
+To find the best path between a set of points:
+`python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --weight weight --points points`
+where *weight* is the routing cost function to optimize (e.g., *distance* or *green_area_weight*) and *points* is a list of space-separated OpenStreetMap identifiers of the FootNode nodes of the graph.
 
+The script will return:
+- a matrix with the cost between each pair of points,
+- a csv file with the path between each pair as sequence of FootNode nodes.
 
-python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --weight distance
-python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --weight green_area_weight
+If no value is specified for *points*, all the amenities in the graph are considered and the nearest FootNode node is identified.
+If *points='bbox'* then you need to specify the parameters *latitude_min*, *latitude_max*, *longitude_min*, *longitude_max*, to define a bounding box and only the amenities in the bounding box will be extracted.
+In these cases, the script will return also the file with the list of amenities and the nearest FootNode node.
 
-python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --points bbox --latitude_min 44.640049 --latitude_max 44.652324 --longitude_min 10.917066 --longitude_max 10.934938 --weight green_area_weight
-
-
-points = all
-points = bbox (devono esserci lat lon)
-points = lista di nodi FootNode --> verificare se funziona
-
-puoi usarlo per calcolare il routing tra coppie di punti che sono footnode
-oppure puoi usarlo per il routing tra le amenity (tutte oppure di un bbox)
-
-
-python routing/tsp.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass
+Example to find the best paths between all the amenities in the city center of Modena:
+`python routing/routing.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --points bbox --latitude_min 44.640049 --latitude_max 44.652324 --longitude_min 10.917066 --longitude_max 10.934938 --weight distance`
 
 
-python utils/visualization.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --points "10033394700 10033394686 10033394690 10033394715 4479772518 10033394678 5260701924 5260701926 250857466 6082860448 250846418 9221534513 250857471 6152233507 5088833596 5088833597 5088833598 315731994 315731991 9235768193 10979381512 10658458534 1256903860 10556615834 10556615835 12218692352 250851333 4482988393 4482988394 10543781404"  
+To solve the Traveling Salesperson Problem (TSP), i.e., to identify the best path to visit a set of points once and only once:
+`python routing/tsp.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd neo4jpwd --points points`
+where *points* is the sequence of space-separated OpenStreetMap identifiers of the FootNode nodes of the points to visit.
 
+If no value is specified for *points*, N points are selected randomly from the FootNode nodes near the amenities. The default number of points is 5, but this number can be modified through the *num_points* parameter.
 
-neo4jpwd
+Note that the execution time of this script increases exponentially as the number of points grows. The script takes less than 40 seconds for up to 9 points, but from 10 points onward, the time increases significantly (8 minutes for 10 points), as does the memory usage.
 
-FootNode anzichè roadjunction
-POI anzichè PointOfInterest
-
-MATCH (c:OSMNode) SET c.location = point({latitude: c.lat, longitude: c.lon, srid:4326})
-
-
-
-Adding amenities to the graph
-python amenity.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd modenapass --latitude 44.645885 --longitude 10.9255707 --distance 5000
-
-
-Selecting amenities of interest:
-MATCH (f:RoadJunction)<-[r:NEAR]-(:OSMWayNode)<-[:MEMBER]-(n:PointOfInterest)-[:TAGS]-(t:Tag) 
-where n.name is not null and 
-(t.tourism='attraction' or t.amenity='place_of_worship' or t.place='square' or t.amenity='fountain')
-with n.name as poi_name, collect(f.id) as footnodes, collect(r.distance) as distances
-with poi_name, footnodes, distances, apoc.coll.indexOf(distances,min(distances)) as min_index 
-with poi_name, footnodes[min_index] as footnode, distances[min_index] as dist
-match (rj:RoadJunction {id: footnode}), (poi:PointOfInterest {name: poi_name}) 
-return collect([rj.lat, rj.lon]), collect(poi.name), collect(rj.id) as osm_id
-
-
-
-
-                       #, default = ['10911594251', '10911594425', '10911594443', '10917017001', '10911594239', '10911587741'])
-# "6341815000","2021402106","1787128164","5303704141","5304947702","2021511952","315580126","1352341299","1256958142","4712448240","1256958133"
-# "10917017350", "10911594286", "10917017015", "10917017269", "10917017335"
-# "10681444158", "11065366611", "1627367784", "7619003474", "5905023674", "5477225907", "1344463148", "359743769", "2199223548", "4611974715" --> retrieved on neo4j through amenity
-
-
-
-python graph/create_footpath_graph.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd londonpass --latitude 51.5074456 --longitude -0.1277653 --distance 30000
-python graph/integrate_green_area.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j  --neo4jpwd londonpass --latitude 51.5074456 --longitude -0.1277653 --distance 30000
+The script will create the map with the optimal path and will store the path as sequence of FootNode nodes in a csv file.

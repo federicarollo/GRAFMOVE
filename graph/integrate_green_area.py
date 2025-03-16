@@ -169,7 +169,7 @@ def main(args=None):
     if(not query.endswith(end_query)):
         query += end_query
         queries.append(query)
-    print("Number of queries to perform: " + str(query))
+    print("Number of queries to perform: " + str(len(queries)))
     
     for query in queries:
         success = 0
