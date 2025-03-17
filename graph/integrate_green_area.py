@@ -142,7 +142,7 @@ def main(args=None):
     print("Number of ways of green areas: " + str(len(ways_of_green_area)))
     
     
-    api = overpy.Overpass()
+    api = overpy.Overpass()#url="http://localhost:12346/api/interpreter")
     polygons = []
     queries = []
     start_query = """[out:json]; ( """
@@ -172,22 +172,22 @@ def main(args=None):
     print("Number of queries to perform: " + str(len(queries)))
     
     for query in queries:
-        success = 0
-        while success == 0:
-            try:
-                result = api.query(query)
-                # result = requests.get(url, params={'data': query})
-                # data = result.json()['elements']
-                for node in result.nodes:
-                    nodes_in_green_area.append(str(node.id))
-                success = 1
-            except overpy.exception.OverpassGatewayTimeout as e:
-                time.sleep(5)
-            except overpy.exception.OverpassTooManyRequests as e:
-                time.sleep(5)
-        # result = api.query(query)
-        # for node in result.nodes:
-        #     nodes_in_green_area.append(str(node.id))
+        # success = 0
+        # while success == 0:
+        #     try:
+        #         result = api.query(query)
+        #         # result = requests.get(url, params={'data': query})
+        #         # data = result.json()['elements']
+        #         for node in result.nodes:
+        #             nodes_in_green_area.append(str(node.id))
+        #         success = 1
+        #     except overpy.exception.OverpassGatewayTimeout as e:
+        #         time.sleep(5)
+        #     except overpy.exception.OverpassTooManyRequests as e:
+        #         time.sleep(5)
+        result = api.query(query)
+        for node in result.nodes:
+            nodes_in_green_area.append(str(node.id))
             
     print("Total number of nodes in green area: " + str(len(nodes_in_green_area)))
 

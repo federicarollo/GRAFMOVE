@@ -16,7 +16,7 @@ To create the graph:
 
 `python graph/create_footpath_graph.py --neo4jURL neo4j://localhost:7687 --neo4juser neo4j --neo4jpwd neo4jpwd --latitude lat --longitude lon --distance dist`
 
-where *lat* and *lot* are the latitude and longitude of th center point, while *dist* is the distance from the center point to define the bounding box
+where *lat* and *lot* are the latitude and longitude of the center point and *dist* is the distance from the center point to define the bounding box.
 
 Example to create the graph of Modena:
 

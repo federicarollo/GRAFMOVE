@@ -76,23 +76,30 @@ class Amenity:
         """Connect the POIs to the nearest FootNodes in the graph."""
         with conn.driver.session() as session:
             result = session.run("""
-                                MATCH (p:OSMNode)
-                                WITH p
-                                MATCH (n:FootNode)
-                                WHERE point.distance(n.location, p.location) < 100
-                                MERGE (p)-[r:NEAR]->(n)
-                                ON CREATE SET r.distance = point.distance(n.location, p.location)
+                                CALL apoc.periodic.iterate(
+                                "MATCH (p:OSMNode) return p",
+                                "MATCH (n:FootNode) WHERE point.distance(n.location, p.location) < 100 MERGE (p)-[r:NEAR]->(n) ON CREATE SET r.distance = point.distance(n.location, p.location)", 
+                                {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;
                                 """)
             return result.values()
 
     def set_index(self, conn):
         """create index on nodes"""
         with conn.driver.session() as session:
+            # result = session.run("""
+            #                        CREATE INDEX FOR (n:OSMWay) ON (n.osm_id)
+            #                     """)
+            # result = session.run("""
+            #                        CREATE INDEX FOR (n:OSMNode) ON (n.osm_id)
+            #                     """)
             result = session.run("""
-                                   CREATE INDEX FOR (n:OSMWay) ON (n.osm_id)
+                                   CREATE POINT INDEX osmnode_location_index FOR (p:OSMNode) ON (p.location);
                                 """)
             result = session.run("""
-                                   CREATE INDEX FOR (n:OSMNode) ON (n.osm_id)
+                                   CREATE POINT INDEX footnode_location_index FOR (n:FootNode) ON (n.location);
                                 """)
             return result.values()
 
@@ -100,7 +107,13 @@ class Amenity:
         """create index on nodes"""
         with conn.driver.session() as session:
             result = session.run("""
-                                   MATCH (c:OSMNode) SET c.location = point({latitude: c.lat, longitude: c.lon, srid:4326})
+                                CALL apoc.periodic.iterate(
+                                "MATCH (c:OSMNode) return c",
+                                "SET c.location = point({latitude: c.lat, longitude: c.lon, srid:4326})", 
+                                {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;
                                 """)
             return result.values()
 
@@ -175,9 +188,9 @@ def main(args=None):
     amenity.import_way(neo4jconn)
     
     print("Imported " + str(len(list_ways)) + " POIs as ways")
-
-
-
+    
+    
+    
     result = api.query(f"""(   
                            node(around:{dist},{lat},{lon})["amenity"];
                            node(around:{dist},{lat},{lon})["tourism"];
@@ -196,17 +209,20 @@ def main(args=None):
     with open(path + 'amenity_nodes.json', "w") as f:
         json.dump(res, f)
     amenity.import_node(neo4jconn)
-
+    
     print("Imported " + str(len(list_nodes)) + " POIs as nodes")
     
     
     amenity.import_nodes_into_spatial_layer(neo4jconn)
+    print("Imported nodes in the spatial layer")
     
     amenity.set_location(neo4jconn)
+    print("Location set")
     
-    # amenity.set_index(neo4jconn)
+    amenity.set_index(neo4jconn)
 
     amenity.connect_amenity(neo4jconn)
+    print("Amenity connected")
 
     neo4jconn.close_connection()
 
