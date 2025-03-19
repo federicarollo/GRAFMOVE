@@ -158,7 +158,6 @@ def main(args=None):
                            way(around:{dist},{lat},{lon})["amenity"];
                            way(around:{dist},{lat},{lon})["place"="square"];
                            way(around:{dist},{lat},{lon})["tourism"];
-                           way(around:{dist},{lat},{lon})["place"="square"];
                            );(._;>;);
                            out body;
 						""")
@@ -220,6 +219,7 @@ def main(args=None):
     print("Location set")
     
     amenity.set_index(neo4jconn)
+    print("Index set")
 
     amenity.connect_amenity(neo4jconn)
     print("Amenity connected")

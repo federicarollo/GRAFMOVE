@@ -80,7 +80,7 @@ class GreenArea:
                                 set n.green_area = \"yes\" 
                                 return count(n)
                                 """, footnodes_list=footnodes_list)        
-            return result.values()
+            return result.values()[0]
 
 
 def add_options():
@@ -133,7 +133,7 @@ def main(args=None):
                            
     url = 'http://overpass-api.de/api/interpreter'
     result = requests.get(url, params={'data': query})
-    data = result.json()['elements']    
+    data = result.json()['elements']
     
     nodes_in_green_area = [str(elem['id']) for elem in data if elem['type']=='node']
     print("Number of nodes of green areas: " + str(len(nodes_in_green_area)))
@@ -142,7 +142,7 @@ def main(args=None):
     print("Number of ways of green areas: " + str(len(ways_of_green_area)))
     
     
-    api = overpy.Overpass()#url="http://localhost:12346/api/interpreter")
+    api = overpy.Overpass(url="http://localhost:12346/api/interpreter")
     polygons = []
     queries = []
     start_query = """[out:json]; ( """
@@ -171,7 +171,10 @@ def main(args=None):
         queries.append(query)
     print("Number of queries to perform: " + str(len(queries)))
     
+    count=0
     for query in queries:
+        print(count)
+        count+=1
         # success = 0
         # while success == 0:
         #     try:
@@ -186,13 +189,14 @@ def main(args=None):
         #     except overpy.exception.OverpassTooManyRequests as e:
         #         time.sleep(5)
         result = api.query(query)
+        print("Number of nodes retrieved by the query: " + str(len(result.nodes)))
         for node in result.nodes:
             nodes_in_green_area.append(str(node.id))
             
     print("Total number of nodes in green area: " + str(len(nodes_in_green_area)))
 
     count  = greenarea.find_matching_footnodes(neo4jconn, nodes_in_green_area)
-    print("Green area property updated to nodes: " + str(count))
+    print("Green area property updated to nodes: " + str(count[0]))
     
     
     greenarea.set_weight(neo4jconn)
