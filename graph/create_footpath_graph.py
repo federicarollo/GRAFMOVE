@@ -131,7 +131,7 @@ def main(args=None):
     
     neo4jconn = Neo4jConnection(options.neo4jURL, options.neo4juser, options.neo4jpwd)
     neo4jconn.open_connection()
-    path = neo4jconn.get_path()[0][0] + '\\' + neo4jconn.get_import_folder_name()[0][0] + '\\' + options.file_name
+    path = neo4jconn.get_path()[0][0] + '/' + neo4jconn.get_import_folder_name()[0][0] + '/' + options.file_name
     print(path)
     
     G = ox.graph_from_point((options.lat, options.lon),

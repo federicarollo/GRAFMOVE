@@ -150,7 +150,7 @@ def main(args=None):
     options = argParser.parse_args(args=args)
     neo4jconn = Neo4jConnection(options.neo4jURL, options.neo4juser, options.neo4jpwd)
     neo4jconn.open_connection()
-    path = neo4jconn.get_path()[0][0] + '\\' + neo4jconn.get_import_folder_name()[0][0] + '\\' #+ options.file_name
+    path = neo4jconn.get_path()[0][0] + '/' + neo4jconn.get_import_folder_name()[0][0] + '/' #+ options.file_name
     
     amenity = Amenity()
     
