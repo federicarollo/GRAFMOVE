@@ -19,18 +19,6 @@ class GreenArea:
         
     def set_weight(self, conn):
         with conn.driver.session() as session:
-            # session.run("""
-            #             MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) set r.green_area = 0 return r
-            #             """)
-            # session.run("""
-            #             MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) where r1.green_area = 'yes' or r2.green_area = 'yes' set r.green_area = 50 return r
-            #             """)
-            # session.run("""
-            #             MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) where r1.green_area = 'yes' and r2.green_area = 'yes' set r.green_area = 100 return r
-            #             """)
-            # session.run("""
-            #             match ()-[r:ROUTE]-() set r.green_area_weight = r.distance / (r.green_area/100 + 1) return count(r)
-            #             """)
 
             query = """CALL apoc.periodic.iterate(
             "MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) return r1, r2, r",
@@ -73,13 +61,18 @@ class GreenArea:
     def find_matching_footnodes(self, conn, footnodes_list):
         with conn.driver.session() as session:
             result = session.run("""
-                                with $footnodes_list as footnodes_list 
-                                unwind footnodes_list as f
-                                with f 
-                                match(n:FootNode) where n.id = toString(f)
-                                set n.green_area = \"yes\" 
-                                return count(n)
-                                """, footnodes_list=footnodes_list)        
+            WITH $footnodes_list AS footnodes_list
+            CALL apoc.periodic.iterate(
+              "UNWIND $footnodes_list AS f
+               MATCH (n:FootNode)
+               WHERE n.id = toString(f)
+               RETURN n",
+              "SET n.green_area = 'yes'",
+              {batchSize: 1000, params: {footnodes_list: footnodes_list}}
+            )
+            YIELD batches, total
+            RETURN batches, total;
+             """, footnodes_list=footnodes_list)
             return result.values()[0]
 
 
@@ -142,7 +135,7 @@ def main(args=None):
     print("Number of ways of green areas: " + str(len(ways_of_green_area)))
     
     
-    api = overpy.Overpass(url="http://localhost:12346/api/interpreter")
+    api = overpy.Overpass() # if you are using a local istance of overpass, add this with proper port: url="http://localhost:12346/api/interpreter"
     polygons = []
     queries = []
     start_query = """[out:json]; ( """
@@ -164,17 +157,14 @@ def main(args=None):
                     query += end_query
                     queries.append(query)
                     query = start_query
-
+    
     
     if(not query.endswith(end_query)):
         query += end_query
         queries.append(query)
     print("Number of queries to perform: " + str(len(queries)))
     
-    count=0
     for query in queries:
-        print(count)
-        count+=1
         # success = 0
         # while success == 0:
         #     try:
@@ -196,7 +186,7 @@ def main(args=None):
     print("Total number of nodes in green area: " + str(len(nodes_in_green_area)))
 
     count  = greenarea.find_matching_footnodes(neo4jconn, nodes_in_green_area)
-    print("Green area property updated to nodes: " + str(count[0]))
+    print("Green area property updated to nodes: " + str(count[1]))
     
     
     greenarea.set_weight(neo4jconn)
