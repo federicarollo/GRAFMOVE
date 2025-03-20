@@ -65,3 +65,8 @@ If no value is specified for *points*, N points are selected randomly from the F
 Note that the execution time of this script increases exponentially as the number of points grows. The script takes less than 40 seconds for up to 9 points, but from 10 points onward, the time increases significantly (8 minutes for 10 points), as does the memory usage.
 
 The script will create the map with the optimal path and will store the path as sequence of FootNode nodes in a csv file.
+
+
+
+**Note**: If you are creating a graph for a relatively large area, consider using a local instance of the Overpass API, which you can be installed on your device via Docker (https://github.com/wiktorn/Overpass-API).
+Consequently, you will need to modify the following line of code *api = overpy.Overpass()* in the files *integrate_green_area.py* and *add_amenity.py*, assigning the URL of your local Overpass API instance (e.g., http://localhost:12346/api/interpreter) to the URL parameter within the parentheses.

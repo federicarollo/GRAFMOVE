@@ -43,7 +43,12 @@ class FootPathGraph:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                   "MATCH (n) RETURN n",
-                                  "SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x)}), n.lat = tofloat(n.y), n.lon = tofloat(n.x), n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')'", 
+                                  "SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x), srid:4326}), 
+                                  n.lat = tofloat(n.y), 
+                                  n.lon = tofloat(n.x), 
+                                  n.latitude = tofloat(n.y), 
+                                  n.longitude = tofloat(n.x), 
+                                  n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')'", 
                                   {batchSize:1000, iterateList:true}
                                 )
                                 YIELD batches, total
@@ -86,8 +91,11 @@ class FootPathGraph:
     def import_nodes_in_spatial_layer(self, conn):
         with conn.driver.session() as session:
             result = session.run("""
-                                match (n:FootNode)
-                                CALL apoc.spatial.addNode('spatial', n) yield node return node;
+                                    MATCH (n:FootNode) 
+                                    where n.location is not null
+                                    CALL spatial.addNode('spatial_node', n) 
+                                    YIELD node 
+                                    RETURN count(node)
                                 """)
             return result.values()
 
@@ -152,6 +160,9 @@ def main(args=None):
     
     graph.set_index(neo4jconn)
     print("Index set")
+    
+    graph.import_nodes_in_spatial_layer(neo4jconn)
+    print("Imported nodes in spatial layer")
     
     neo4jconn.close_connection()
 

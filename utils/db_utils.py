@@ -78,8 +78,9 @@ class Neo4jConnection:
                     """)
             if len(result.values()) == 0:
                 result = session.run("""
-                    call spatial.addWKTLayer('spatial', 'geometry')
+                    CALL spatial.addPointLayer('spatial_node');
                     """)
+                    # call spatial.addWKTLayer('spatial_node', 'geometry')
             return result.values()
         
        

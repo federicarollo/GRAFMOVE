@@ -68,7 +68,8 @@ class Amenity:
         with conn.driver.session() as session:
             result = session.run("""
                                 match(n:OSMNode)
-                                CALL spatial.addNode('spatial', n) yield node return node
+                                where n.location is not null
+                                CALL spatial.addNode('spatial_node', n) yield node return node
                                 """)
             return result.values()
 
@@ -78,7 +79,9 @@ class Amenity:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                 "MATCH (p:OSMNode) return p",
-                                "MATCH (n:FootNode) WHERE point.distance(n.location, p.location) < 100 MERGE (p)-[r:NEAR]->(n) ON CREATE SET r.distance = point.distance(n.location, p.location)", 
+                                "MATCH (n:FootNode) 
+                                WHERE point.distance(n.location, p.location) < 100 MERGE (p)-[r:NEAR]->(n) 
+                                ON CREATE SET r.distance = point.distance(n.location, p.location)", 
                                 {batchSize:1000, iterateList:true}
                                 )
                                 YIELD batches, total
@@ -109,7 +112,9 @@ class Amenity:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                 "MATCH (c:OSMNode) return c",
-                                "SET c.location = point({latitude: c.lat, longitude: c.lon, srid:4326})", 
+                                "SET c.location = point({latitude: c.lat, longitude: c.lon, srid:4326}), 
+                                c.latitude = tofloat(c.lat),
+                                c.longitude = tofloat(c.lon)", 
                                 {batchSize:1000, iterateList:true}
                                 )
                                 YIELD batches, total
@@ -153,7 +158,7 @@ def main(args=None):
     lon = options.lon
     lat = options.lat
     
-    api = overpy.Overpass()
+    api = overpy.Overpass()#url="http://localhost:12346/api/interpreter")
     result = api.query(f"""(   
                            way(around:{dist},{lat},{lon})["amenity"];
                            way(around:{dist},{lat},{lon})["place"="square"];
@@ -178,15 +183,9 @@ def main(args=None):
     list_node_way_json = {"elements": list_node_way}
     list_ways_json = {"elements": list_ways}
     
-    with open(path + 'nodes_of_ways.json', "w") as f:
-        json.dump(list_node_way_json, f)
-    amenity.import_node_way(neo4jconn)
+
     
-    with open(path + "amenity_ways.json", "w") as f:
-        json.dump(list_ways_json, f)
-    amenity.import_way(neo4jconn)
-    
-    print("Imported " + str(len(list_ways)) + " POIs as ways")
+    print("Number of ways: " + str(len(list_ways)))
     
     
     
@@ -204,13 +203,29 @@ def main(args=None):
              'lon': str(node.lon),
              'tags': node.tags}
         list_nodes.append(d)
-    res = {"elements": list_nodes}
+    list_nodes_json = {"elements": list_nodes}
+
+    print("Number of nodes " + str(len(list_nodes)))
+
+    with open(path + 'nodes_of_ways.json', "w") as f:
+        json.dump(list_node_way_json, f)
+    
+    with open(path + "amenity_ways.json", "w") as f:
+        json.dump(list_ways_json, f)
+
     with open(path + 'amenity_nodes.json', "w") as f:
-        json.dump(res, f)
+        json.dump(list_nodes_json, f)
+
+    
+    amenity.import_node_way(neo4jconn)
+    print("Imported nodes of ways")
+    
+    amenity.import_way(neo4jconn)
+    print("Imported ways")
+    
     amenity.import_node(neo4jconn)
-    
-    print("Imported " + str(len(list_nodes)) + " POIs as nodes")
-    
+    print("Imported nodes")
+
     
     amenity.import_nodes_into_spatial_layer(neo4jconn)
     print("Imported nodes in the spatial layer")
@@ -221,8 +236,8 @@ def main(args=None):
     amenity.set_index(neo4jconn)
     print("Index set")
 
-    amenity.connect_amenity(neo4jconn)
-    print("Amenity connected")
+    # amenity.connect_amenity(neo4jconn)
+    # print("Amenity connected")
 
     neo4jconn.close_connection()
 
