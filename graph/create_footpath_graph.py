@@ -84,7 +84,10 @@ class FootPathGraph:
     def set_index(self, conn):
         with conn.driver.session() as session:
             result = session.run("""
-                                    CREATE INDEX FOR (n:FootNode) ON (n.id)
+                                    CREATE INDEX footnode_id_index FOR (n:FootNode) ON (n.id)
+                                """)
+            result = session.run("""
+                                    CREATE POINT INDEX footnode_location_index FOR (n:FootNode) ON (n.location)
                                 """)
             return result.values()       
      
@@ -143,7 +146,7 @@ def main(args=None):
                             )
     ox.save_graphml(G, path)
     
-    neo4jconn.generate_spatial_layer()
+    neo4jconn.generate_spatial_layer('spatial_footnode')
     
     graph = FootPathGraph()
     graph.create_graph(neo4jconn, options.file_name)

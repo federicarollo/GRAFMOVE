@@ -69,9 +69,25 @@ class Amenity:
             result = session.run("""
                                 match(n:OSMNode)
                                 where n.location is not null
-                                CALL spatial.addNode('spatial_node', n) yield node return node
+                                CALL spatial.addNode('spatial_osmnode', n) yield node return node
                                 """)
             return result.values()
+
+    # def connect_amenity(self, conn):
+    #     """Connect the POIs to the nearest FootNodes in the graph."""
+    #     with conn.driver.session() as session:
+    #         result = session.run("""
+    #                             CALL apoc.periodic.iterate(
+    #                             "MATCH (p:OSMNode) return p",
+    #                             "MATCH (n:FootNode) 
+    #                             WHERE point.distance(n.location, p.location) < 100 MERGE (p)-[r:NEAR]->(n) 
+    #                             ON CREATE SET r.distance = point.distance(n.location, p.location)", 
+    #                             {batchSize:1000, iterateList:true}
+    #                             )
+    #                             YIELD batches, total
+    #                             RETURN batches, total;
+    #                             """)
+    #         return result.values()
 
     def connect_amenity(self, conn):
         """Connect the POIs to the nearest FootNodes in the graph."""
@@ -79,9 +95,9 @@ class Amenity:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                 "MATCH (p:OSMNode) return p",
-                                "MATCH (n:FootNode) 
-                                WHERE point.distance(n.location, p.location) < 100 MERGE (p)-[r:NEAR]->(n) 
-                                ON CREATE SET r.distance = point.distance(n.location, p.location)", 
+                                "CALL spatial.closest('spatial_node', p.location, 1) YIELD node AS nearestFootNode
+                                MERGE (p)-[r:NEAR]->(nearestFootNode)
+                                ON CREATE SET r.distance = point.distance(nearestFootNode.location, p.location)", 
                                 {batchSize:1000, iterateList:true}
                                 )
                                 YIELD batches, total
@@ -92,17 +108,8 @@ class Amenity:
     def set_index(self, conn):
         """create index on nodes"""
         with conn.driver.session() as session:
-            # result = session.run("""
-            #                        CREATE INDEX FOR (n:OSMWay) ON (n.osm_id)
-            #                     """)
-            # result = session.run("""
-            #                        CREATE INDEX FOR (n:OSMNode) ON (n.osm_id)
-            #                     """)
             result = session.run("""
                                    CREATE POINT INDEX osmnode_location_index FOR (p:OSMNode) ON (p.location);
-                                """)
-            result = session.run("""
-                                   CREATE POINT INDEX footnode_location_index FOR (n:FootNode) ON (n.location);
                                 """)
             return result.values()
 
@@ -183,8 +190,6 @@ def main(args=None):
     list_node_way_json = {"elements": list_node_way}
     list_ways_json = {"elements": list_ways}
     
-
-    
     print("Number of ways: " + str(len(list_ways)))
     
     
@@ -207,6 +212,8 @@ def main(args=None):
 
     print("Number of nodes " + str(len(list_nodes)))
 
+
+
     with open(path + 'nodes_of_ways.json', "w") as f:
         json.dump(list_node_way_json, f)
     
@@ -226,6 +233,8 @@ def main(args=None):
     amenity.import_node(neo4jconn)
     print("Imported nodes")
 
+    neo4jconn.generate_spatial_layer('spatial_osmnode')
+    print("Generated spatial layer")
     
     amenity.import_nodes_into_spatial_layer(neo4jconn)
     print("Imported nodes in the spatial layer")
