@@ -135,7 +135,7 @@ def main(args=None):
     print("Number of ways of green areas: " + str(len(ways_of_green_area)))
     
     
-    api = overpy.Overpass() # if you are using a local istance of overpass, add this with proper port: url="http://localhost:12346/api/interpreter"
+    api = overpy.Overpass()#url="http://localhost:12350/api/interpreter") # if you are using a local istance of overpass, add this with proper port: url="http://localhost:12346/api/interpreter"
     polygons = []
     queries = []
     start_query = """[out:json]; ( """
@@ -183,6 +183,9 @@ def main(args=None):
         for node in result.nodes:
             nodes_in_green_area.append(str(node.id))
             
+    with open(path + 'nodes_in_green_area.csv', "w") as f:
+        json.dump(nodes_in_green_area, f)
+
     print("Total number of nodes in green area: " + str(len(nodes_in_green_area)))
 
     count  = greenarea.find_matching_footnodes(neo4jconn, nodes_in_green_area)

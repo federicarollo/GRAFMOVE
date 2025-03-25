@@ -69,7 +69,9 @@ class Amenity:
             result = session.run("""
                                 match(n:OSMNode)
                                 where n.location is not null
-                                CALL spatial.addNode('spatial_osmnode', n) yield node return node
+                                CALL spatial.addNode('spatial_osmnode', n) 
+                                yield node 
+                                return count(node)
                                 """)
             return result.values()
 
@@ -94,11 +96,13 @@ class Amenity:
         with conn.driver.session() as session:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
-                                "MATCH (p:OSMNode) return p",
-                                "CALL spatial.closest('spatial_node', p.location, 1) YIELD node AS nearestFootNode
-                                MERGE (p)-[r:NEAR]->(nearestFootNode)
-                                ON CREATE SET r.distance = point.distance(nearestFootNode.location, p.location)", 
-                                {batchSize:1000, iterateList:true}
+                                    "MATCH (p:OSMNode) RETURN p",
+                                    "CALL spatial.withinDistance('spatial_footnode', p.location, 0.1) YIELD node, distance
+                                    with p, collect(node) as nodes, collect(distance) as distances 
+                                with p, nodes[0] as nearbyFootNode, distances[0] as nearDistance
+                                     MERGE (p)-[r:NEAR]->(nearbyFootNode)
+                                     ON CREATE SET r.distance = nearDistance", 
+                                    {batchSize:500, iterateList:true, parallel:false}
                                 )
                                 YIELD batches, total
                                 RETURN batches, total;
@@ -209,20 +213,20 @@ def main(args=None):
              'tags': node.tags}
         list_nodes.append(d)
     list_nodes_json = {"elements": list_nodes}
-
+    
     print("Number of nodes " + str(len(list_nodes)))
-
-
-
+    
+    
+    
     with open(path + 'nodes_of_ways.json', "w") as f:
         json.dump(list_node_way_json, f)
     
     with open(path + "amenity_ways.json", "w") as f:
         json.dump(list_ways_json, f)
-
+    
     with open(path + 'amenity_nodes.json', "w") as f:
         json.dump(list_nodes_json, f)
-
+    
     
     amenity.import_node_way(neo4jconn)
     print("Imported nodes of ways")
@@ -232,21 +236,21 @@ def main(args=None):
     
     amenity.import_node(neo4jconn)
     print("Imported nodes")
-
-    neo4jconn.generate_spatial_layer('spatial_osmnode')
-    print("Generated spatial layer")
-    
-    amenity.import_nodes_into_spatial_layer(neo4jconn)
-    print("Imported nodes in the spatial layer")
     
     amenity.set_location(neo4jconn)
     print("Location set")
     
+    neo4jconn.generate_spatial_layer('spatial_osmnode')
+    print("Generated spatial layer")
+    
+    res = amenity.import_nodes_into_spatial_layer(neo4jconn)
+    print("Nodes imported in the spatial layer: " + str(res[0]))
+    
     amenity.set_index(neo4jconn)
     print("Index set")
 
-    # amenity.connect_amenity(neo4jconn)
-    # print("Amenity connected")
+    amenity.connect_amenity(neo4jconn)
+    print("Amenity connected")
 
     neo4jconn.close_connection()
 

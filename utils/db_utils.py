@@ -73,14 +73,10 @@ class Neo4jConnection:
     def generate_spatial_layer(self, name):
         """generate the spatial layer of the project"""
         with self.driver.session() as session:
-            result = session.run("""
-                    call spatial.layers()
-                    """)
-            if len(result.values()) == 0:
-                result = session.run(f"""
-                    CALL spatial.addPointLayer('{name}');
-                    """)
-                    # call spatial.addWKTLayer('spatial_node', 'geometry')
+            result = session.run(f"""
+                CALL spatial.addPointLayer('{name}');
+                """)
+                # call spatial.addWKTLayer('spatial_node', 'geometry')
             return result.values()
         
        

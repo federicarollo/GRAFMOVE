@@ -96,7 +96,7 @@ class FootPathGraph:
             result = session.run("""
                                     MATCH (n:FootNode) 
                                     where n.location is not null
-                                    CALL spatial.addNode('spatial_node', n) 
+                                    CALL spatial.addNode('spatial_footnode', n) 
                                     YIELD node 
                                     RETURN count(node)
                                 """)
