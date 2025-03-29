@@ -33,13 +33,6 @@ class FootPathGraph:
 
     def set_location(self, conn):
         with conn.driver.session() as session:
-            # result = session.run("""
-            #                     MATCH (n:FootNode) SET n.location = point({latitude: tofloat(n.y), longitude: tofloat(n.x)}),
-            #                     n.lat = tofloat(n.y), 
-            #                     n.lon = tofloat(n.x),
-            #                     n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')';
-            #                     """)
-
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                   "MATCH (n) RETURN n",
@@ -60,11 +53,7 @@ class FootPathGraph:
 
     def set_distance(self, conn):
         """insert the distance in the nodes' relationships."""
-        with conn.driver.session() as session:
-            # result = session.run("""
-            #                        MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) SET r.distance=point.distance(n1.location, n2.location)
-            #                     """)
-            
+        with conn.driver.session() as session:            
             result = session.run("""
                                     CALL apoc.periodic.iterate(
                                     "MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) RETURN r, n1, n2",
@@ -76,10 +65,16 @@ class FootPathGraph:
                                 """)
             return result.values()
 
-    # def set_edge_geometry(conn, graph):
-    #     with conn.driver.session() as session:
-    #         result = session.run("""MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) SET r.geometry = 'LINESTRING()' """)
-    #     return result.values()
+    def set_edge_geometry(conn, graph):
+        with conn.driver.session() as session:
+            result = session.run("""CALL apoc.periodic.iterate(
+                                    "MATCH (a:FootNode)-[r:ROUTE]->(b:FootNode) where a.lat is not null and b.lat is not null return a.lat as lat_a, a.lon as lon_a, b.lat as lat_b, b.lon as lon_b, r",
+                                    "set r.geometry='LINESTRING(' + lon_a + ' ' + lat_a + ', ' + lon_b + ' ' + lat_b + ')'", 
+                                    {batchSize:1000, iterateList:true}
+                                    )
+                                    YIELD batches, total
+                                    RETURN batches, total;""")
+        return result.values()
     
     def set_index(self, conn):
         with conn.driver.session() as session:
@@ -89,18 +84,78 @@ class FootPathGraph:
             result = session.run("""
                                     CREATE POINT INDEX footnode_location_index FOR (n:FootNode) ON (n.location)
                                 """)
-            return result.values()       
+            return result.values()
      
     def import_nodes_in_spatial_layer(self, conn):
         with conn.driver.session() as session:
             result = session.run("""
-                                    MATCH (n:FootNode) 
-                                    where n.location is not null
-                                    CALL spatial.addNode('spatial_footnode', n) 
-                                    YIELD node 
-                                    RETURN count(node)
+                                MATCH (n:FootNode)
+                                where n.is_pedestrian_grafmove='yes'
+                                return min(id(n))
                                 """)
+            min_id = result.values()[0]
+            result = session.run("""
+                                MATCH (n:FootNode)
+                                where n.is_pedestrian_grafmove='yes'
+                                return max(id(n))
+                                """)
+            max_id = result.values()[0]
+
+            limit_max=min_id+1000
+
+            while min_id <= max_id:
+                
+                result = session.run("""
+                                        match (n:FootNode)
+                                        where n.location is not null
+                                        and n.is_pedestrian_grafmove='yes'
+                                        and id(n)>=%s and id(n)<%s
+                                        with collect(n) as footnodes
+                                        CALL spatial.addNodes('spatial_footnode', footnodes) 
+                                        YIELD count 
+                                        RETURN count"""%(min_id, limit_max))
+                min_id+=1000
+                limit_max+=1000
+
             return result.values()
+
+    def find_connected_components(self, conn):
+        with conn.driver.session() as session:
+                result = session.run("""
+                                    call gds.graph.project.cypher(
+                                    'filtered_graph',
+                                    'match (n:FootNode) return id(n) as id',
+                                    'match (m)-[r:ROUTE]-(n) where 
+                                    not r.highway in ["motorway", "motorway_link", "motorway_junction", 
+                                    "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", 
+                                    "busway", "bus_guideway", "bus_stop", 
+                                    "escape", "raceway", "corridor", "services", "emergency_bay", "proposed", "construction"]
+                                    return id(n) as source, type(r) as type, id(m) as target') """)
+                                    
+                result = session.run("""
+                                    CALL gds.wcc.write('filtered_graph', { writeProperty: 'componentId' })
+                                    YIELD nodePropertiesWritten, componentCount;""")
+                print(result)
+                conn_comp_num = result.values()[0][1]
+                
+                result = session.run("""
+                                    MATCH (n:FootNode)
+                                    WHERE n.componentId IS NOT NULL
+                                    RETURN n.componentId AS componentId, count(n) AS nodeCount
+                                    ORDER BY nodeCount DESC
+                                    limit 5""")
+                conn_comps = result.values()
+                
+                return conn_comp_num, conn_comps
+
+    def set_is_pedestrian(self, conn, compId):
+        with conn.driver.session() as session:
+                result = session.run("""
+                                    match (n:FootNode)
+                                    with n, case when n.componentId=%s then 'yes' else 'no' end as value
+                                    set n.is_pedestrian_grafmove=value"""%(compId))
+        
+
 
 def add_options():
     parser = argparse.ArgumentParser(description='Creation of the graph.')
@@ -163,9 +218,24 @@ def main(args=None):
     
     graph.set_index(neo4jconn)
     print("Index set")
+
+    cc_num, ccomponents = graph.find_connected_components(neo4jconn)
+    print("Number of connected components: " + str(cc_num))
+    print("Top 5 connected components sorted by number of nodes:")
+    print("ComponentId\tNumber of nodes")
+    for comp in ccomponents:
+        print(str(comp[0]) + "\t\t" + str(comp[1]))
+
+    first_componentId = ccomponents[0][0]
     
+    graph.set_is_pedestrian(neo4jconn, first_componentId)
+    print("Set is_pedestrian_grafmove set")
+
     graph.import_nodes_in_spatial_layer(neo4jconn)
     print("Imported nodes in spatial layer")
+    
+    graph.set_edge_geometry(neo4jconn)
+    print("Set edge geometry")
     
     neo4jconn.close_connection()
 

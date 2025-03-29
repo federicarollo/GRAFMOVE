@@ -135,7 +135,7 @@ def main(args=None):
     print("Number of ways of green areas: " + str(len(ways_of_green_area)))
     
     
-    api = overpy.Overpass()#url="http://localhost:12350/api/interpreter") # if you are using a local istance of overpass, add this with proper port: url="http://localhost:12346/api/interpreter"
+    api = overpy.Overpass()
     polygons = []
     queries = []
     start_query = """[out:json]; ( """
@@ -165,19 +165,6 @@ def main(args=None):
     print("Number of queries to perform: " + str(len(queries)))
     
     for query in queries:
-        # success = 0
-        # while success == 0:
-        #     try:
-        #         result = api.query(query)
-        #         # result = requests.get(url, params={'data': query})
-        #         # data = result.json()['elements']
-        #         for node in result.nodes:
-        #             nodes_in_green_area.append(str(node.id))
-        #         success = 1
-        #     except overpy.exception.OverpassGatewayTimeout as e:
-        #         time.sleep(5)
-        #     except overpy.exception.OverpassTooManyRequests as e:
-        #         time.sleep(5)
         result = api.query(query)
         print("Number of nodes retrieved by the query: " + str(len(result.nodes)))
         for node in result.nodes:
@@ -191,9 +178,7 @@ def main(args=None):
     count  = greenarea.find_matching_footnodes(neo4jconn, nodes_in_green_area)
     print("Green area property updated to nodes: " + str(count[1]))
     
-    
     greenarea.set_weight(neo4jconn)
-    
     
     
     neo4jconn.close_connection()

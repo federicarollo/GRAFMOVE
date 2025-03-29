@@ -11,15 +11,11 @@ class Neo4jConnection:
         self.user = user
         self.password = password
         self.driver = None
-        # self.session = None
 
     def open_connection(self):
         self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
-        # self.session = self.driver.session()
 
     def close_connection(self):
-        # if self.session:
-        #     self.session.close()
         if self.driver:
             self.driver.close()
 
@@ -80,20 +76,3 @@ class Neo4jConnection:
             return result.values()
         
        
-
-
-"""
-def main(args=None):
-    argParser = add_options()
-    options = argParser.parse_args(args=args)
-    db_utils = DBUtils(options.neo4jURL, options.neo4juser, options.neo4jpwd)
-    
-    
-    
-    return 0
-
-
-if __name__ == "__main__":
-    main()
-
-"""

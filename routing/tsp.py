@@ -174,17 +174,6 @@ def main(args=None):
     with open(options.path_filename, "w") as f:
         f.write(path)
     
-    
-    # coordinates = greeter.get_coordinates(final_path = str(final_path))
-    # print(coordinates)
-    # m = fo.Map(location=[coordinates[0][0][0][0], coordinates[0][0][0][1]], zoom_start=13)
-    # if len(coordinates[0][0]) == 0:
-    #         print('\nNo result for query')
-    # else:
-    #     fo.PolyLine(coordinates[0][0], color="green", weight=5).add_to(m)
-    #     m.save(file + '.html')
-    
-
     path_utils = PathUtils()
     
     coordinates = path_utils.get_coordinates(neo4jconn, path)

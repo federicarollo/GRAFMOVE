@@ -1,0 +1,839 @@
+{
+  "title": "GRAFMOVE",
+  "version": "2.4",
+  "settings": {
+    "pagenumber": 0,
+    "editable": true,
+    "fullscreenEnabled": false,
+    "parameters": {
+      "neodash_tag_name_1": "",
+      "neodash_tag_name_1_display": "",
+      "neodash_tag_name_2": "",
+      "neodash_tag_name_2_display": "",
+      "neodash_path_finding_algorithm": "astar",
+      "neodash_name1": [],
+      "neodash_name2": [],
+      "neodash_name3": "80° Miglio",
+      "neodash_name1_display": [],
+      "neodash_name2_display": [],
+      "neodash_poi1": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi1_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi2": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi2_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi3": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi3_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi4": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi4_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi5": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi5_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi6": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi6_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi7": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi7_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi8": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi8_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi9": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_poi9_display": [
+        "10 Corso Como",
+        "100 Montaditos",
+        "ABC Rent",
+        "AD Sushi and More",
+        "BPER Banca",
+        "BPER Banca"
+      ],
+      "neodash_weight": "distance",
+      "neodash_algo": "astar",
+      "neodash_algo_tsp": "astar",
+      "neodash_weight_tsp": "green_area_weight",
+      "neodash_pois_tsp": [],
+      "neodash_pois_tsp_display": []
+    },
+    "theme": "light",
+    "queryTimeLimit": 120,
+    "downloadImageEnabled": true,
+    "disableRowLimiting": true
+  },
+  "pages": [
+    {
+      "title": "Graph overview",
+      "reports": [
+        {
+          "id": "68cb91df-b45e-4235-98b9-e3586013d47f",
+          "title": "FootNode nodes",
+          "query": "match(n:FootNode) return count(n)",
+          "width": 6,
+          "height": 2,
+          "x": 0,
+          "y": 2,
+          "type": "value",
+          "selection": {},
+          "settings": {},
+          "schema": []
+        },
+        {
+          "id": "af524e23-5dc0-4a89-b02b-21b1eb7cd707",
+          "title": "Routes",
+          "query": "match ()-[r:ROUTE]-() return count(distinct r)",
+          "width": 6,
+          "height": 2,
+          "x": 0,
+          "y": 0,
+          "type": "value",
+          "selection": {},
+          "settings": {},
+          "schema": []
+        },
+        {
+          "id": "1ae07eb8-80f5-47a4-a567-3aeb772bb548",
+          "title": "POIs",
+          "query": "match (n:POI) return count(n)",
+          "width": 6,
+          "height": 2,
+          "x": 0,
+          "y": 4,
+          "type": "value",
+          "selection": {},
+          "settings": {},
+          "schema": []
+        },
+        {
+          "id": "ca3372d9-5640-4811-a6b3-267045bb1ed0",
+          "title": "Schools",
+          "query": "match(p:POI:OSMNode)-[:TAGS]-(t:Tag) where t.amenity='school' return p",
+          "width": 9,
+          "height": 6,
+          "x": 6,
+          "y": 4,
+          "type": "map",
+          "selection": {
+            "OSMNode": "name",
+            "POI": "name"
+          },
+          "settings": {},
+          "schema": [
+            [
+              "OSMNode",
+              "osm_id",
+              "gtype",
+              "latitude",
+              "bbox",
+              "name",
+              "location",
+              "lon",
+              "geometry",
+              "lat",
+              "longitude"
+            ],
+            [
+              "POI",
+              "osm_id",
+              "gtype",
+              "latitude",
+              "bbox",
+              "name",
+              "location",
+              "lon",
+              "geometry",
+              "lat",
+              "longitude"
+            ]
+          ]
+        },
+        {
+          "id": "26187acb-9297-4098-91c7-62e36b767b3b",
+          "title": "Parking",
+          "query": "match(p:POI:OSMNode)-[:TAGS]-(t:Tag) where t.amenity='parking' or exists(t.parking) return p\n\n\n",
+          "width": 9,
+          "height": 6,
+          "x": 15,
+          "y": 4,
+          "type": "map",
+          "selection": {
+            "OSMNode": "name",
+            "POI": "name"
+          },
+          "settings": {},
+          "schema": [
+            [
+              "OSMNode",
+              "osm_id",
+              "gtype",
+              "bbox",
+              "latitude",
+              "name",
+              "location",
+              "lon",
+              "geometry",
+              "lat",
+              "longitude"
+            ],
+            [
+              "POI",
+              "osm_id",
+              "gtype",
+              "bbox",
+              "latitude",
+              "name",
+              "location",
+              "lon",
+              "geometry",
+              "lat",
+              "longitude"
+            ]
+          ]
+        },
+        {
+          "id": "833597c2-4719-4465-a9c9-397f27b42807",
+          "title": "Graph structure",
+          "query": "call db.schema.visualization()",
+          "width": 10,
+          "height": 4,
+          "x": 6,
+          "y": 0,
+          "type": "graph",
+          "selection": {
+            "SpatialLayer": "name",
+            "_Neodash_Dashboard": "name",
+            "OSMWay": "name",
+            "FootNode": "name",
+            "OSMNode": "name",
+            "POI": "name",
+            "Tag": "name",
+            "SHORTEST_ROUTE_TO": "(label)",
+            "ROUTE": "(label)",
+            "RTREE_METADATA": "(label)",
+            "PART_OF": "(label)",
+            "RTREE_REFERENCE": "(label)",
+            "NEAR": "(label)",
+            "TAGS": "(label)"
+          },
+          "settings": {
+            "frozen": true,
+            "nodePositions": {
+              "-1": [
+                58.7492974259641,
+                25.458665510955992
+              ],
+              "-8": [
+                5.577657275184763,
+                -10.06957336963895
+              ],
+              "-14": [
+                -11.204849306242323,
+                6.816594004086088
+              ],
+              "-11": [
+                0.8284048547870231,
+                -19.399395507719625
+              ],
+              "-9": [
+                12.952854964806622,
+                15.380673345033918
+              ],
+              "-10": [
+                -23.24642528421462,
+                -6.659603764706987
+              ],
+              "-12": [
+                20.668225625519675,
+                -15.786402741848992
+              ],
+              "-13": [
+                -6.705251966336408,
+                23.38962081444592
+              ],
+              "-15": [
+                58.22349428398885,
+                18.26345891146289
+              ],
+              "-21": [
+                -51.59856424754292,
+                -17.87908953822565
+              ],
+              "-18": [
+                -52.012812605098205,
+                16.125281416088608
+              ],
+              "-16": [
+                47.594671436800226,
+                0.2569019254201219
+              ],
+              "-17": [
+                -15.012429558210918,
+                -7.558678219739597
+              ],
+              "-19": [
+                22.32466835434777,
+                23.652725736893508
+              ],
+              "-20": [
+                -6.868205586692704,
+                23.051572704380224
+              ],
+              "-3": [
+                61.846831884027765,
+                0.690920856837943
+              ],
+              "-4": [
+                39.35884078687185,
+                -22.3460101883313
+              ],
+              "-5": [
+                -20.872421162945987,
+                13.607224554247797
+              ],
+              "-2": [
+                14.511794529203575,
+                49.726535620739156
+              ],
+              "-6": [
+                9.883177981589775,
+                -16.953852067967514
+              ],
+              "-7": [
+                -26.4383979982338,
+                -7.71130534525477
+              ]
+            }
+          },
+          "schema": [
+            [
+              "SpatialLayer",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "_Neodash_Dashboard",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "OSMWay",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "FootNode",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "OSMNode",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "POI",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "Tag",
+              "name",
+              "indexes",
+              "constraints"
+            ],
+            [
+              "SHORTEST_ROUTE_TO"
+            ],
+            [
+              "ROUTE"
+            ],
+            [
+              "RTREE_METADATA"
+            ],
+            [
+              "PART_OF"
+            ],
+            [
+              "RTREE_REFERENCE"
+            ],
+            [
+              "NEAR"
+            ],
+            [
+              "TAGS"
+            ]
+          ]
+        },
+        {
+          "id": "4c47566b-7519-4d20-ade8-e75dcedd1900",
+          "title": "Types of POIs",
+          "query": "MATCH (t:Tag)\nWHERE EXISTS(t.amenity)\nRETURN t.amenity AS amenityValue, COUNT(t) AS occurrenceCount\nORDER BY occurrenceCount DESC;",
+          "width": 6,
+          "height": 4,
+          "x": 0,
+          "y": 10,
+          "type": "table",
+          "selection": {},
+          "settings": {},
+          "schema": []
+        },
+        {
+          "id": "9c75b631-1b56-4d83-a119-845ff990b226",
+          "title": "Number of FootNodes in top 10 components",
+          "query": "match (n:FootNode)\nwith n.componentId as id\nreturn id, count(id) as sum\norder by sum desc\nlimit 10",
+          "width": 8,
+          "height": 4,
+          "x": 16,
+          "y": 0,
+          "type": "bar",
+          "selection": {
+            "index": "id",
+            "value": "sum",
+            "key": "(none)"
+          },
+          "settings": {
+            "refreshButtonEnabled": true
+          },
+          "schema": []
+        }
+      ]
+    },
+    {
+      "title": "Routing",
+      "reports": [
+        {
+          "id": "9d9c6a34-c78d-49d0-8aff-1f42efcc6c1a",
+          "title": "Best path",
+          "query": "CALL apoc.do.when(\n$neodash_algo = 'astar',\n'MATCH (poi1:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_1})\nWITH collect(poi1) AS targetPois1\nMATCH (a:FootNode)<-[r1:NEAR]-(x)\nWHERE (x IN targetPois1) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois1\n      })\nWITH a, r1.distance AS distance1\nORDER BY distance1 DESC\nLIMIT 1\nWITH a \nMATCH (poi2:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_2})\nWITH a, collect(poi2) AS targetPois2\nMATCH (b:FootNode)<-[r2:NEAR]-(x)\nWHERE (x IN targetPois2) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois2\n      })\nWITH a, b, r2.distance AS distance2\nORDER BY distance2 ASC\nLIMIT 1\nWITH a, b\nCALL apoc.algo.aStar(\n a,\n b,\n \"ROUTE\",\n $neodash_weight, \"lat\", \"lon\"\n) YIELD path, weight\nWITH [n IN nodes(path) | n.id] AS shortestHopNodeIds,\n[r in relationships(path) | id(r)] as shortestHopRelIds, a, b\nUNWIND shortestHopRelIds as shortrel\nMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\nwhere id(r)=shortrel\nRETURN n1, n2, r, a, b',\n'MATCH (poi1:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_1})\nWITH collect(poi1) AS targetPois1\nMATCH (a:FootNode)<-[r1:NEAR]-(x)\nWHERE (x IN targetPois1) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois1\n      })\nWITH a, r1.distance AS distance1\nORDER BY distance1 ASC\nLIMIT 1\nWITH a \nMATCH (poi2:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_2})\nWITH a, collect(poi2) AS targetPois2\nMATCH (b:FootNode)<-[r2:NEAR]-(x)\nWHERE (x IN targetPois2) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois2\n      })\nWITH a, b, r2.distance AS distance2\nORDER BY distance2 DESC\nLIMIT 1\nWITH a, b\nCALL apoc.algo.dijkstra(\n a,\n b,\n \"ROUTE\",\n $neodash_weight\n) YIELD path, weight\nWITH [n IN nodes(path) | n.id] AS shortestHopNodeIds,\n[r in relationships(path) | id(r)] as shortestHopRelIds, a, b\nUNWIND shortestHopRelIds as shortrel\nMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\nwhere id(r)=shortrel\nRETURN n1, n2, r, shortestHopNodeIds, a, b',\n{neodash_path_finding_algorithm: $neodash_path_finding_algorithm, neodash_tag_name_1: $neodash_tag_name_1, neodash_tag_name_2: $neodash_tag_name_2, neodash_weight: $neodash_weight}) yield value\nwith value.n1 as s1, value.n2 as s2, value.r as r, value.shortestHopNodeIds as shortestHopNodeIds,\ncase when value.n1.id = value.a.id or value.n1.id = value.b.id then 'red' else 'transparent' end as color\nreturn {id: id(s1), label: \"FootNode\", point: s1.location, color: color}, r",
+          "width": 18,
+          "height": 7,
+          "x": 6,
+          "y": 2,
+          "type": "map",
+          "selection": {
+            "ROUTE": "name"
+          },
+          "settings": {
+            "refreshButtonEnabled": true,
+            "fullscreenEnabled": true,
+            "downloadImageEnabled": true,
+            "defaultNodeSize": "small",
+            "defaultRelWidth": 2,
+            "styleRules": [
+              {
+                "field": "$neodash_weight",
+                "condition": "!=",
+                "value": "distance",
+                "customization": "marker color",
+                "customizationValue": "black"
+              },
+              {
+                "field": "",
+                "condition": "=",
+                "value": "",
+                "customization": "marker color",
+                "customizationValue": "black"
+              }
+            ],
+            "actionsRules": [
+              {
+                "condition": "Click",
+                "field": "",
+                "value": "",
+                "customization": "set variable",
+                "customizationValue": ""
+              }
+            ],
+            "nodeColorScheme": "dark2",
+            "clusterMarkers": false,
+            "defaultRelColor": "#000000"
+          },
+          "schema": [
+            [
+              "ROUTE",
+              "distance",
+              "green_area",
+              "green_area_weight",
+              "length",
+              "geometry",
+              "highway",
+              "reversed",
+              "oneway",
+              "name",
+              "maxspeed",
+              "access",
+              "lanes"
+            ]
+          ]
+        },
+        {
+          "id": "e084fc22-7dbb-4256-ac11-39b2268ad3d5",
+          "title": "Enter data",
+          "query": "match (t1:Tag {name: $neodash_tag_name_1}),\n(t2:Tag {name: $neodash_tag_name_2})\nreturn t1, t2",
+          "width": 6,
+          "height": 3,
+          "x": 0,
+          "y": 6,
+          "type": "forms",
+          "selection": {},
+          "settings": {
+            "formFields": [
+              {
+                "type": "Node Property",
+                "settings": {
+                  "type": "Node Property",
+                  "entityType": "Tag",
+                  "propertyType": "name",
+                  "propertyTypeDisplay": "name",
+                  "parameterName": "neodash_tag_name_1",
+                  "id": "1",
+                  "description": "",
+                  "helperText": "POI origin",
+                  "manualParameterSave": false
+                },
+                "query": "MATCH (n:`Tag`) \nWHERE toLower(toString(n.`name`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`name` as value,  n.`name` as display ORDER BY size(toString(value)) ASC LIMIT 5"
+              },
+              {
+                "type": "Node Property",
+                "settings": {
+                  "type": "Node Property",
+                  "entityType": "Tag",
+                  "propertyType": "name",
+                  "propertyTypeDisplay": "name",
+                  "parameterName": "neodash_tag_name_2",
+                  "id": "2",
+                  "helperText": "POI destination"
+                },
+                "query": "MATCH (n:`Tag`) \nWHERE toLower(toString(n.`name`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`name` as value,  n.`name` as display ORDER BY size(toString(value)) ASC LIMIT 5"
+              }
+            ],
+            "hasSubmitButton": false,
+            "clearParametersAfterSubmit": false,
+            "downloadImageEnabled": false
+          },
+          "schema": []
+        },
+        {
+          "id": "862cfe8f-26b6-409e-95d2-cb087204ca50",
+          "title": "Weight",
+          "query": "with ['distance',  'green_area_weight'] as weights\nunwind weights as w\nreturn 'Select' as Select, w",
+          "width": 6,
+          "height": 3,
+          "x": 0,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "actionsRules": [
+              {
+                "condition": "Click",
+                "field": "Select",
+                "value": "w",
+                "customization": "set variable",
+                "customizationValue": "weight"
+              }
+            ],
+            "columnWidthsType": "Relative (%)"
+          }
+        },
+        {
+          "id": "ac3c368f-770d-4158-9996-f70def84ac5e",
+          "title": "Path finding alfìgorithm",
+          "query": "with ['astar',  'dijkstra'] as algorithms\nunwind algorithms as algo\nreturn 'Select' as Select, algo\n\n\n",
+          "width": 6,
+          "height": 3,
+          "x": 0,
+          "y": 3,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "actionsRules": [
+              {
+                "condition": "Click",
+                "field": "Select",
+                "value": "algo",
+                "customization": "set variable",
+                "customizationValue": "algo"
+              }
+            ]
+          }
+        },
+        {
+          "id": "eb4bc9dc-e0ed-49aa-a46a-00ba4b0ee923",
+          "title": "Best path cost",
+          "query": "CALL apoc.do.when(\n$neodash_algo = 'astar',\n'MATCH (poi1:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_1})\nWITH collect(poi1) AS targetPois1\nMATCH (a:FootNode)<-[r1:NEAR]-(x)\nWHERE (x IN targetPois1) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois1\n      })\nWITH a, r1.distance AS distance1\nORDER BY distance1 DESC\nLIMIT 1\nWITH a \nMATCH (poi2:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_2})\nWITH a, collect(poi2) AS targetPois2\nMATCH (b:FootNode)<-[r2:NEAR]-(x)\nWHERE (x IN targetPois2) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois2\n      })\nWITH a, b, r2.distance AS distance2\nORDER BY distance2 ASC\nLIMIT 1\nWITH a, b\nCALL apoc.algo.aStar(\n a,\n b,\n \"ROUTE\",\n $neodash_weight, \"lat\", \"lon\"\n) YIELD path, weight\nWITH [n IN nodes(path) | n.id] AS shortestHopNodeIds,\n[r in relationships(path) | id(r)] as shortestHopRelIds\nUNWIND shortestHopRelIds as shortrel\nMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\nwhere id(r)=shortrel\nRETURN n1, n2, r, sum(r.distance) as sumdist, sum(r.green_area_weight) as green',\n'MATCH (poi1:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_1})\nWITH collect(poi1) AS targetPois1\nMATCH (a:FootNode)<-[r1:NEAR]-(x)\nWHERE (x IN targetPois1) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois1\n      })\nWITH a, r1.distance AS distance1\nORDER BY distance1 ASC\nLIMIT 1\nWITH a \nMATCH (poi2:POI)-[:TAGS]->(:Tag {name: $neodash_tag_name_2})\nWITH a, collect(poi2) AS targetPois2\nMATCH (b:FootNode)<-[r2:NEAR]-(x)\nWHERE (x IN targetPois2) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois2\n      })\nWITH a, b, r2.distance AS distance2\nORDER BY distance2 DESC\nLIMIT 1\nWITH a, b\nCALL apoc.algo.dijkstra(\n a,\n b,\n \"ROUTE\",\n $neodash_weight\n) YIELD path, weight\nWITH [n IN nodes(path) | n.id] AS shortestHopNodeIds,\n[r in relationships(path) | id(r)] as shortestHopRelIds\nUNWIND shortestHopRelIds as shortrel\nMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\nwhere id(r)=shortrel\nRETURN n1, n2, r, sum(r.distance) as sumdist, sum(r.green_area_weight) as green',\n{neodash_path_finding_algorithm: $neodash_path_finding_algorithm, neodash_tag_name_1: $neodash_tag_name_1, neodash_tag_name_2: $neodash_tag_name_2, neodash_weight: $neodash_weight}) yield value\nreturn sum(value.sumdist) as distance, sum(value.green) as green_area_weight\n\n\n",
+          "width": 18,
+          "height": 2,
+          "x": 6,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {}
+        }
+      ]
+    },
+    {
+      "title": "TSP",
+      "reports": [
+        {
+          "id": "cfe44542-8974-4bba-b72a-5d45796a16d7",
+          "title": "Select up to 9 POIs",
+          "query": "match (t:Tag)\nwhere t.name is not null \nand size(t.name)>3\nand (t.tourism='attraction' or t.amenity='place_of_worship' or t.place='square' or t.amenity='fountain')\nwith distinct t.name as name, coalesce(t.amenity, t.place, t.tourism) as type\nreturn name as Name, type as Type\norder by name asc\n\n\n",
+          "width": 8,
+          "height": 4,
+          "x": 0,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "actionsRules": [
+              {
+                "condition": "rowCheck",
+                "field": "Select",
+                "value": "Name",
+                "customization": "set variable",
+                "customizationValue": "pois_tsp"
+              }
+            ],
+            "allowDownload": true
+          }
+        },
+        {
+          "id": "f031b5bf-8b91-4907-a426-2290134f2213",
+          "title": "Best path",
+          "query": "CALL apoc.do.when(\n$neodash_algo_tsp = 'astar',\n'WITH $neodash_pois_tsp as selection\nUNWIND selection as name\nMATCH (t:Tag {name: name})<-[:TAGS]-(poi:POI)\nWITH name, collect(poi) AS targetPois\nMATCH (a:FootNode)<-[r:NEAR]-(x)\nWHERE (x IN targetPois) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois\n      })\nWITH name, a, r.distance AS distance\nORDER BY name, distance ASC\nwith name, \n       collect(a)[0] AS closestFootNode\nwith collect(closestFootNode) as footnodes\n            UNWIND footnodes as c1 \n                WITH \n                  c1, \n                  [c in footnodes where c.id > c1.id] as c2s, \n                  footnodes \n                UNWIND c2s as c2 \n                    CALL apoc.algo.aStar(\n                      c1, \n                      c2, \n                      \"ROUTE\",\n                      $neodash_weight_tsp, \"lat\", \"lon\") \n                    YIELD path, weight \n                    WITH \n                      c1, \n                      c2, \n                      weight as totalCost, \n                      [n in nodes(path) | n.id] as shortestHopNodeIds, \n                      [r in relationships(path) | id(r)] as shortestHopRelIds, \n                      footnodes \n                    MERGE (c1) -[r:SHORTEST_ROUTE_TO]- (c2) \n                    SET r.cost = totalCost \n                    SET r.shortestHopNodeIds = shortestHopNodeIds\n                    SET r.shortestHopRelIds = shortestHopRelIds \n                    WITH \n                      c1, \n                      c2, \n                      (size(footnodes)-1) as level, \n                      footnodes \n                    CALL apoc.path.expandConfig(\n                      c1, \n                      { relationshipFilter: \"SHORTEST_ROUTE_TO\", \n                        minLevel: level, \n                        maxLevel: level, \n                        whitelistNodes: footnodes, \n                        terminatorNodes: [c2], \n                        uniqueness: \"NODE_PATH\" } ) \n                    YIELD path\n                    WITH nodes(path) as orderedFootnodes, \n                    [node in nodes(path) | node.id] as orderedIds,\n                    reduce(cost = 0, x in relationships(path) | cost + x.cost) as totalCost, \n                    [r in relationships(path) | r.shortestHopNodeIds] as shortestRouteNodeIds\n                    MATCH (:FootNode {id: orderedIds[0]})-[rel:SHORTEST_ROUTE_TO]-(:FootNode {id: reverse(orderedIds)[0]})\n                    WITH orderedFootnodes+orderedFootnodes[0] as orderedFootnodes, orderedIds+orderedIds[0] as orderedIds, totalCost+rel.cost as totalCost, shortestRouteNodeIds as shortestRouteNodeIds\n                    ORDER BY totalCost LIMIT 1\n                    UNWIND range(0, size(orderedFootnodes)) as index \n                        UNWIND shortestRouteNodeIds[index] as shortestHopNodeId \n                            WITH orderedFootnodes, \n                            totalCost,\n                            index,\n                            CASE \n                                WHEN toString(shortestRouteNodeIds[index][0]) = toString(orderedIds[index])\n                                THEN tail(collect(shortestHopNodeId)) \n                                ELSE tail(reverse(collect(shortestHopNodeId))) \n                            END as orderedHopNodeIds \n                            ORDER BY index \n                            UNWIND orderedHopNodeIds as orderedHopNodeId \n                                MATCH (c:FootNode) where c.id = orderedHopNodeId \n                                with \n                                  [c in orderedFootnodes | c.id] as orderedFootnodesIds, \n                                  totalCost,\n                                  orderedFootnodes[0].id as first,\n                                  orderedFootnodes[size(orderedFootnodes)-2].id as last,\n                                  [orderedFootnodes[0].id] + collect(c.id) as footnodeRouteIds\n                            MATCH (:FootNode {id: toString(first)})-[r:SHORTEST_ROUTE_TO]-(:FootNode {id: toString(last)})\n                            with orderedFootnodesIds, totalCost, footnodeRouteIds, r,\n                            CASE \n                                WHEN toString(r.shortestHopNodeIds[0]) = toString(last)\n                                THEN tail(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item))\n                                ELSE tail(reverse(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item)))\n                            END as lastpath\n                            with footnodeRouteIds+lastpath as totalPath, orderedFootnodesIds as poi_nodes\n\t\t\t\t\t\t\tMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\n\t\t\t\t\t\t\twhere n1.id in totalPath\n                            and n2.id in totalPath\n\t\t\t\t\t\t\tRETURN n1 as start_node, n2 as end_node, r as rel, poi_nodes\n\t\t\t\t\t\t\t',\n'WITH $neodash_pois_tsp as selection\nUNWIND selection as name\nMATCH (t:Tag {name: name})<-[:TAGS]-(poi:POI)\nWITH name, collect(poi) AS targetPois\nMATCH (a:FootNode)<-[r:NEAR]-(x)\nWHERE (x IN targetPois) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois\n      })\nWITH name, a, r.distance AS distance\nORDER BY name, distance ASC\nwith name, \n       collect(a)[0] AS closestFootNode\nwith collect(closestFootNode) as footnodes\n            UNWIND footnodes as c1 \n                WITH \n                  c1, \n                  [c in footnodes where c.id > c1.id] as c2s, \n                  footnodes \n                UNWIND c2s as c2 \n                    CALL apoc.algo.dijkstra(\n                      c1, \n                      c2, \n                      \"ROUTE\",\n                      $neodash_weight_tsp) \n                    YIELD path, weight \n                    WITH \n                      c1, \n                      c2, \n                      weight as totalCost, \n                      [n in nodes(path) | n.id] as shortestHopNodeIds, \n                      [r in relationships(path) | id(r)] as shortestHopRelIds, \n                      footnodes \n                    MERGE (c1) -[r:SHORTEST_ROUTE_TO]- (c2) \n                    SET r.cost = totalCost \n                    SET r.shortestHopNodeIds = shortestHopNodeIds\n                    SET r.shortestHopRelIds = shortestHopRelIds \n                    WITH \n                      c1, \n                      c2, \n                      (size(footnodes)-1) as level, \n                      footnodes \n                    CALL apoc.path.expandConfig(\n                      c1, \n                      { relationshipFilter: \"SHORTEST_ROUTE_TO\", \n                        minLevel: level, \n                        maxLevel: level, \n                        whitelistNodes: footnodes, \n                        terminatorNodes: [c2], \n                        uniqueness: \"NODE_PATH\" } ) \n                    YIELD path\n                    WITH nodes(path) as orderedFootnodes, \n                    [node in nodes(path) | node.id] as orderedIds,\n                    reduce(cost = 0, x in relationships(path) | cost + x.cost) as totalCost, \n                    [r in relationships(path) | r.shortestHopNodeIds] as shortestRouteNodeIds\n                    MATCH (:FootNode {id: orderedIds[0]})-[rel:SHORTEST_ROUTE_TO]-(:FootNode {id: reverse(orderedIds)[0]})\n                    WITH orderedFootnodes+orderedFootnodes[0] as orderedFootnodes, orderedIds+orderedIds[0] as orderedIds, totalCost+rel.cost as totalCost, shortestRouteNodeIds as shortestRouteNodeIds\n                    ORDER BY totalCost LIMIT 1\n                    UNWIND range(0, size(orderedFootnodes)) as index \n                        UNWIND shortestRouteNodeIds[index] as shortestHopNodeId \n                            WITH orderedFootnodes, \n                            totalCost,\n                            index,\n                            CASE \n                                WHEN toString(shortestRouteNodeIds[index][0]) = toString(orderedIds[index])\n                                THEN tail(collect(shortestHopNodeId)) \n                                ELSE tail(reverse(collect(shortestHopNodeId))) \n                            END as orderedHopNodeIds \n                            ORDER BY index \n                            UNWIND orderedHopNodeIds as orderedHopNodeId \n                                MATCH (c:FootNode) where c.id = orderedHopNodeId \n                                with \n                                  [c in orderedFootnodes | c.id] as orderedFootnodesIds, \n                                  totalCost,\n                                  orderedFootnodes[0].id as first,\n                                  orderedFootnodes[size(orderedFootnodes)-2].id as last,\n                                  [orderedFootnodes[0].id] + collect(c.id) as footnodeRouteIds\n                            MATCH (:FootNode {id: toString(first)})-[r:SHORTEST_ROUTE_TO]-(:FootNode {id: toString(last)})\n                            with orderedFootnodesIds, totalCost, footnodeRouteIds, r,\n                            CASE \n                                WHEN toString(r.shortestHopNodeIds[0]) = toString(last)\n                                THEN tail(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item))\n                                ELSE tail(reverse(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item)))\n                            END as lastpath\n                            with footnodeRouteIds+lastpath as totalPath, orderedFootnodesIds as poi_nodes\n\t\t\t\t\t\t\tMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\n\t\t\t\t\t\t\twhere n1.id in totalPath\n                            and n2.id in totalPath\n\t\t\t\t\t\t\tRETURN n1 as start_node, n2 as end_node, r as rel, poi_nodes',\n{neodash_algo_tsp: $neodash_algo_tsp, neodash_weight_tsp: $neodash_weight_tsp, neodash_pois_tsp: $neodash_pois_tsp}) yield value\nwith value.start_node as s, value.rel as r, \ncase when value.start_node.id in value.poi_nodes then 'red' else 'transparent' end  as color\nreturn {id: id(s), label: \"FootNode\", point: s.location, color: color}, r",
+          "width": 16,
+          "height": 8,
+          "x": 8,
+          "y": 2,
+          "type": "map",
+          "selection": {
+            "ROUTE": "name"
+          },
+          "settings": {
+            "fullscreenEnabled": true,
+            "downloadImageEnabled": true,
+            "refreshButtonEnabled": true,
+            "nodeColorScheme": "dark2",
+            "defaultNodeSize": "small",
+            "clusterMarkers": false,
+            "defaultRelColor": "#000000",
+            "defaultRelWidth": 3
+          },
+          "schema": [
+            [
+              "ROUTE",
+              "distance",
+              "green_area",
+              "green_area_weight",
+              "length",
+              "geometry",
+              "highway",
+              "reversed",
+              "oneway",
+              "access",
+              "name",
+              "lanes",
+              "maxspeed",
+              "junction",
+              "width"
+            ]
+          ]
+        },
+        {
+          "id": "247cb7da-91f0-4036-95f9-aaee97f12a36",
+          "title": "Weight",
+          "query": "with ['distance',  'green_area_weight'] as weights\nunwind weights as w\nreturn 'Select' as Select, w\n\n\n",
+          "width": 8,
+          "height": 3,
+          "x": 0,
+          "y": 4,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "actionsRules": [
+              {
+                "condition": "Click",
+                "field": "Select",
+                "value": "w",
+                "customization": "set variable",
+                "customizationValue": "weight_tsp"
+              }
+            ]
+          }
+        },
+        {
+          "id": "ac40c3a2-eba8-4f8a-985d-2caea597e43e",
+          "title": "Path finding algorithm",
+          "query": "with ['astar',  'dijkstra'] as algorithms\nunwind algorithms as algo\nreturn 'Select' as Select, algo\n",
+          "width": 8,
+          "height": 3,
+          "x": 0,
+          "y": 7,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "actionsRules": [
+              {
+                "condition": "Click",
+                "field": "Select",
+                "value": "algo",
+                "customization": "set variable",
+                "customizationValue": "algo_tsp"
+              }
+            ]
+          }
+        },
+        {
+          "id": "a0558429-852e-4aa8-b040-b30bf066c43c",
+          "title": "Best path cost",
+          "query": "CALL apoc.do.when(\n$neodash_algo_tsp = 'astar',\n'WITH $neodash_pois_tsp as selection\nUNWIND selection as name\nMATCH (t:Tag {name: name})<-[:TAGS]-(poi:POI)\nWITH name, collect(poi) AS targetPois\nMATCH (a:FootNode)<-[r:NEAR]-(x)\nWHERE (x IN targetPois) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois\n      })\nWITH name, a, r.distance AS distance\nORDER BY name, distance ASC\nwith name, \n       collect(a)[0] AS closestFootNode\nwith collect(closestFootNode) as footnodes\n            UNWIND footnodes as c1 \n                WITH \n                  c1, \n                  [c in footnodes where c.id > c1.id] as c2s, \n                  footnodes \n                UNWIND c2s as c2 \n                    CALL apoc.algo.aStar(\n                      c1, \n                      c2, \n                      \"ROUTE\",\n                      $neodash_weight_tsp, \"lat\", \"lon\") \n                    YIELD path, weight \n                    WITH \n                      c1, \n                      c2, \n                      weight as totalCost, \n                      [n in nodes(path) | n.id] as shortestHopNodeIds, \n                      [r in relationships(path) | id(r)] as shortestHopRelIds, \n                      footnodes \n                    MERGE (c1) -[r:SHORTEST_ROUTE_TO]- (c2) \n                    SET r.cost = totalCost \n                    SET r.shortestHopNodeIds = shortestHopNodeIds\n                    SET r.shortestHopRelIds = shortestHopRelIds \n                    WITH \n                      c1, \n                      c2, \n                      (size(footnodes)-1) as level, \n                      footnodes \n                    CALL apoc.path.expandConfig(\n                      c1, \n                      { relationshipFilter: \"SHORTEST_ROUTE_TO\", \n                        minLevel: level, \n                        maxLevel: level, \n                        whitelistNodes: footnodes, \n                        terminatorNodes: [c2], \n                        uniqueness: \"NODE_PATH\" } ) \n                    YIELD path\n                    WITH nodes(path) as orderedFootnodes, \n                    [node in nodes(path) | node.id] as orderedIds,\n                    reduce(cost = 0, x in relationships(path) | cost + x.cost) as totalCost, \n                    [r in relationships(path) | r.shortestHopNodeIds] as shortestRouteNodeIds\n                    MATCH (:FootNode {id: orderedIds[0]})-[rel:SHORTEST_ROUTE_TO]-(:FootNode {id: reverse(orderedIds)[0]})\n                    WITH orderedFootnodes+orderedFootnodes[0] as orderedFootnodes, orderedIds+orderedIds[0] as orderedIds, totalCost+rel.cost as totalCost, shortestRouteNodeIds as shortestRouteNodeIds\n                    ORDER BY totalCost LIMIT 1\n                    UNWIND range(0, size(orderedFootnodes)) as index \n                        UNWIND shortestRouteNodeIds[index] as shortestHopNodeId \n                            WITH orderedFootnodes, \n                            totalCost,\n                            index,\n                            CASE \n                                WHEN toString(shortestRouteNodeIds[index][0]) = toString(orderedIds[index])\n                                THEN tail(collect(shortestHopNodeId)) \n                                ELSE tail(reverse(collect(shortestHopNodeId))) \n                            END as orderedHopNodeIds \n                            ORDER BY index \n                            UNWIND orderedHopNodeIds as orderedHopNodeId \n                                MATCH (c:FootNode) where c.id = orderedHopNodeId \n                                with \n                                  [c in orderedFootnodes | c.id] as orderedFootnodesIds, \n                                  totalCost,\n                                  orderedFootnodes[0].id as first,\n                                  orderedFootnodes[size(orderedFootnodes)-2].id as last,\n                                  [orderedFootnodes[0].id] + collect(c.id) as footnodeRouteIds\n                            MATCH (:FootNode {id: toString(first)})-[r:SHORTEST_ROUTE_TO]-(:FootNode {id: toString(last)})\n                            with orderedFootnodesIds, totalCost, footnodeRouteIds, r,\n                            CASE \n                                WHEN toString(r.shortestHopNodeIds[0]) = toString(last)\n                                THEN tail(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item))\n                                ELSE tail(reverse(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item)))\n                            END as lastpath\n                            with footnodeRouteIds+lastpath as totalPath\n\t\t\t\t\t\t\tMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\n\t\t\t\t\t\t\twhere n1.id in totalPath\n                            and n2.id in totalPath\n\t\t\t\t\t\t\tRETURN sum(r.distance) as totdistance, sum(r.green_area_weight) as totgreen\n\t\t\t\t\t\t\t',\n'WITH $neodash_pois_tsp as selection\nUNWIND selection as name\nMATCH (t:Tag {name: name})<-[:TAGS]-(poi:POI)\nWITH name, collect(poi) AS targetPois\nMATCH (a:FootNode)<-[r:NEAR]-(x)\nWHERE (x IN targetPois) OR \n      (x:OSMNode AND EXISTS {\n        MATCH (x)-[:PART_OF]->(p) \n        WHERE p IN targetPois\n      })\nWITH name, a, r.distance AS distance\nORDER BY name, distance ASC\nwith name, \n       collect(a)[0] AS closestFootNode\nwith collect(closestFootNode) as footnodes\n            UNWIND footnodes as c1 \n                WITH \n                  c1, \n                  [c in footnodes where c.id > c1.id] as c2s, \n                  footnodes \n                UNWIND c2s as c2 \n                    CALL apoc.algo.dijkstra(\n                      c1, \n                      c2, \n                      \"ROUTE\",\n                      $neodash_weight_tsp) \n                    YIELD path, weight \n                    WITH \n                      c1, \n                      c2, \n                      weight as totalCost, \n                      [n in nodes(path) | n.id] as shortestHopNodeIds, \n                      [r in relationships(path) | id(r)] as shortestHopRelIds, \n                      footnodes \n                    MERGE (c1) -[r:SHORTEST_ROUTE_TO]- (c2) \n                    SET r.cost = totalCost \n                    SET r.shortestHopNodeIds = shortestHopNodeIds\n                    SET r.shortestHopRelIds = shortestHopRelIds \n                    WITH \n                      c1, \n                      c2, \n                      (size(footnodes)-1) as level, \n                      footnodes \n                    CALL apoc.path.expandConfig(\n                      c1, \n                      { relationshipFilter: \"SHORTEST_ROUTE_TO\", \n                        minLevel: level, \n                        maxLevel: level, \n                        whitelistNodes: footnodes, \n                        terminatorNodes: [c2], \n                        uniqueness: \"NODE_PATH\" } ) \n                    YIELD path\n                    WITH nodes(path) as orderedFootnodes, \n                    [node in nodes(path) | node.id] as orderedIds,\n                    reduce(cost = 0, x in relationships(path) | cost + x.cost) as totalCost, \n                    [r in relationships(path) | r.shortestHopNodeIds] as shortestRouteNodeIds\n                    MATCH (:FootNode {id: orderedIds[0]})-[rel:SHORTEST_ROUTE_TO]-(:FootNode {id: reverse(orderedIds)[0]})\n                    WITH orderedFootnodes+orderedFootnodes[0] as orderedFootnodes, orderedIds+orderedIds[0] as orderedIds, totalCost+rel.cost as totalCost, shortestRouteNodeIds as shortestRouteNodeIds\n                    ORDER BY totalCost LIMIT 1\n                    UNWIND range(0, size(orderedFootnodes)) as index \n                        UNWIND shortestRouteNodeIds[index] as shortestHopNodeId \n                            WITH orderedFootnodes, \n                            totalCost,\n                            index,\n                            CASE \n                                WHEN toString(shortestRouteNodeIds[index][0]) = toString(orderedIds[index])\n                                THEN tail(collect(shortestHopNodeId)) \n                                ELSE tail(reverse(collect(shortestHopNodeId))) \n                            END as orderedHopNodeIds \n                            ORDER BY index \n                            UNWIND orderedHopNodeIds as orderedHopNodeId \n                                MATCH (c:FootNode) where c.id = orderedHopNodeId \n                                with \n                                  [c in orderedFootnodes | c.id] as orderedFootnodesIds, \n                                  totalCost,\n                                  orderedFootnodes[0].id as first,\n                                  orderedFootnodes[size(orderedFootnodes)-2].id as last,\n                                  [orderedFootnodes[0].id] + collect(c.id) as footnodeRouteIds\n                            MATCH (:FootNode {id: toString(first)})-[r:SHORTEST_ROUTE_TO]-(:FootNode {id: toString(last)})\n                            with orderedFootnodesIds, totalCost, footnodeRouteIds, r,\n                            CASE \n                                WHEN toString(r.shortestHopNodeIds[0]) = toString(last)\n                                THEN tail(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item))\n                                ELSE tail(reverse(REDUCE(s = [], item IN r.shortestHopNodeIds | s + item)))\n                            END as lastpath\n                            with footnodeRouteIds+lastpath as totalPath\n\t\t\t\t\t\t\tMATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode)\n\t\t\t\t\t\t\twhere n1.id in totalPath\n                            and n2.id in totalPath\n\t\t\t\t\t\t\tRETURN sum(r.distance) as totdistance, sum(r.green_area_weight) as totgreen',\n{neodash_algo_tsp: $neodash_algo_tsp, neodash_weight_tsp: $neodash_weight_tsp, neodash_pois_tsp: $neodash_pois_tsp}) yield value\nreturn sum(value.totdistance) as distance, sum(value.totgreen) as green_area_weight\n\n\n",
+          "width": 16,
+          "height": 2,
+          "x": 8,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "refreshButtonEnabled": true
+          }
+        }
+      ]
+    }
+  ],
+  "parameters": {},
+  "extensions": {
+    "active": true,
+    "activeReducers": [],
+    "advanced-charts": {
+      "active": true
+    },
+    "styling": {
+      "active": true
+    },
+    "actions": {
+      "active": true
+    },
+    "forms": {
+      "active": true
+    }
+  },
+  "uuid": "c0d78a84-03f7-4629-bef0-33db11321ba4"
+}

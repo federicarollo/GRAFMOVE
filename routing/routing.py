@@ -89,9 +89,6 @@ def add_options():
     parser.add_argument('--longitude_max', '-lonmax', dest='longitude_max', type=float,
                        help="""The maximum longitude of the bounding box.""",
                        required=False)
-    # parser.add_argument('--mapName', '-mn', dest='mapName', type=str,
-    #                    help="""Insert the name of the file containing the map with the computed path.""",
-    #                    required=False, default="map")
     parser.add_argument('--matrix_filename', '-mfn', dest='matrix_filename', type=str,
                         help="""Insert the name of the file to write the weight matrix.""",
                         required=False, default="weight_matrix.csv")

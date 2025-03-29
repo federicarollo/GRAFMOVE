@@ -13,19 +13,27 @@ class Amenity:
     def import_node(self, conn):
         """import POI nodes in the graph."""
         with conn.driver.session() as session:
+            
             query = """
-            CALL apoc.load.json("amenity_nodes.json") YIELD value AS value 
-            WITH value.elements AS elements
-            UNWIND elements AS nodo
-            MERGE (n:OSMNode:POI {osm_id: nodo.id})
+            CALL apoc.periodic.iterate(
+            "CALL apoc.load.json('amenity_nodes.json') 
+            YIELD value
+            UNWIND value.elements AS nodo
+            return nodo",
+            "MERGE (n:OSMNode:POI {osm_id: nodo.id})
             ON CREATE SET n.name=nodo.tags.name,
             n.lat=tofloat(nodo.lat), 
             n.lon=tofloat(nodo.lon), 
             n.geometry= 'POINT(' + nodo.lat + ' ' + nodo.lon +')'
             WITH n, nodo
             MERGE (n)-[:TAGS]->(t:Tag)
-            ON CREATE SET t += nodo.tags
+            ON CREATE SET t += nodo.tags", 
+            {batchSize:100, iterateList:true, parallel:false}
+            )
+            YIELD batches, total
+            RETURN batches, total;
             """
+
             result = session.run(query)
             return result.values()
 
@@ -33,14 +41,22 @@ class Amenity:
         """import nodes of the ways in the graph."""
         with conn.driver.session() as session:
             query = """ 
-            CALL apoc.load.json("nodes_of_ways.json") YIELD value AS value 
-            WITH value.elements AS elements
-            UNWIND elements AS nodo
-            MERGE (n:OSMNode {osm_id: nodo.id})
-            ON CREATE SET n.lat=tofloat(nodo.lat), 
-            n.lon=tofloat(nodo.lon), 
-            n.geometry='POINT(' + nodo.lat + ' ' + nodo.lon +')'
+            CALL apoc.periodic.iterate(
+            "CALL apoc.load.json('nodes_of_ways.json') 
+            YIELD value
+            UNWIND value.elements AS node
+            return node",
+            "MERGE (n:OSMNode {osm_id: node.id})
+            ON CREATE SET 
+            n.lat = toFloat(node.lat),
+            n.lon = toFloat(node.lon),
+            n.geometry = 'POINT(' + node.lat + ' ' + node.lon +')'", 
+            {batchSize:100, iterateList:true, parallel:false}
+            )
+            YIELD batches, total
+            RETURN batches, total;
             """
+
             result = session.run(query)
             return result.values()
 
@@ -48,18 +64,25 @@ class Amenity:
         """import amenities as ways in the graph."""
         with conn.driver.session() as session:
             query = """
-            CALL apoc.load.json("amenity_ways.json") YIELD value 
-            WITH value.elements AS elements
-            UNWIND elements AS el
-            MERGE (w:OSMWay:POI {osm_id: el.id}) 
+            CALL apoc.periodic.iterate(
+            "CALL apoc.load.json('amenity_ways.json') 
+            YIELD value
+            UNWIND value.elements AS el
+            return el",
+            "MERGE (w:OSMWay:POI {osm_id: el.id}) 
             ON CREATE SET w.name = el.tags.name
             MERGE (w)-[:TAGS]->(t:Tag) 
             ON CREATE SET t += el.tags
             WITH w, el.nodes AS nodes
             UNWIND nodes AS node
             MATCH (n:OSMNode {osm_id: node})
-            MERGE (n)-[:PART_OF]->(w)
+            MERGE (n)-[:PART_OF]->(w)", 
+            {batchSize:100, iterateList:true, parallel:false}
+            )
+            YIELD batches, total
+            RETURN batches, total;
             """
+
             result = session.run(query)
             return result.values()
 
@@ -67,29 +90,34 @@ class Amenity:
         """Import OSM nodes nodes in a Neo4j Spatial Layer"""
         with conn.driver.session() as session:
             result = session.run("""
-                                match(n:OSMNode)
-                                where n.location is not null
-                                CALL spatial.addNode('spatial_osmnode', n) 
-                                yield node 
-                                return count(node)
+                                MATCH (n:OSMNode)
+                                return min(id(n))
                                 """)
-            return result.values()
+            min_id = result.values()[0]
+            result = session.run("""
+                                MATCH (n:OSMNode)
+                                return max(id(n))
+                                """)
+            max_id = result.values()[0]
 
-    # def connect_amenity(self, conn):
-    #     """Connect the POIs to the nearest FootNodes in the graph."""
-    #     with conn.driver.session() as session:
-    #         result = session.run("""
-    #                             CALL apoc.periodic.iterate(
-    #                             "MATCH (p:OSMNode) return p",
-    #                             "MATCH (n:FootNode) 
-    #                             WHERE point.distance(n.location, p.location) < 100 MERGE (p)-[r:NEAR]->(n) 
-    #                             ON CREATE SET r.distance = point.distance(n.location, p.location)", 
-    #                             {batchSize:1000, iterateList:true}
-    #                             )
-    #                             YIELD batches, total
-    #                             RETURN batches, total;
-    #                             """)
-    #         return result.values()
+            limit_max=min_id+1000
+
+            while min_id <= max_id:
+                
+                result = session.run("""
+                                        match (n:OSMNode)
+                                        where n.location is not null
+                                        and id(n)>=%s and id(n)<%s
+                                        with collect(n) as osmnodes
+                                        CALL spatial.addNodes('spatial_osmnode', osmnodes) 
+                                        YIELD count 
+                                        RETURN count
+                                    """,%(min_id, limit_max))
+                min_id+=1000
+                limit_max+=1000
+
+            return result.values()
+            
 
     def connect_amenity(self, conn):
         """Connect the POIs to the nearest FootNodes in the graph."""
@@ -169,7 +197,7 @@ def main(args=None):
     lon = options.lon
     lat = options.lat
     
-    api = overpy.Overpass()#url="http://localhost:12346/api/interpreter")
+    api = overpy.Overpass()
     result = api.query(f"""(   
                            way(around:{dist},{lat},{lon})["amenity"];
                            way(around:{dist},{lat},{lon})["place"="square"];

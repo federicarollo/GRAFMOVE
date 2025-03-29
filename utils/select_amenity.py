@@ -14,33 +14,6 @@ class SelectAmenities:
     def select_amenity(self, conn):
         """Select amenities with the desired tags."""
         with conn.driver.session() as session:
-            
-            # query = """
-            # MATCH (f:FootNode)<-[r:NEAR]-(n:OSMNode:POI)-[:TAGS]-(t:Tag) 
-            # where n.name is not null and 
-            # (t.tourism='attraction' or t.amenity='place_of_worship' or t.place='square' or t.amenity='fountain')
-            # with n.name as poi_name, collect(f.id) as footnodes, collect(r.distance) as distances
-            # with poi_name, footnodes, distances, apoc.coll.indexOf(distances,min(distances)) as min_index 
-            # with poi_name, footnodes[min_index] as footnode, distances[min_index] as dist
-            # match (rj:FootNode {id: footnode}), (poi:POI {name: poi_name}) 
-            # return collect(rj.id) as osm_id, collect([rj.lat, rj.lon]) as gps_coordinates, collect(poi.name) as name
-            # """
-            # result = session.run(query)
-            # nodes = result.values()[0]
-            # 
-            # query = """
-            # MATCH (f:FootNode)<-[r:NEAR]-(:OSMNode)-[:PART_OF]->(n:OSMWay:POI)-[:TAGS]-(t:Tag) 
-            # where n.name is not null and 
-            # (t.tourism='attraction' or t.amenity='place_of_worship' or t.place='square' or t.amenity='fountain')
-            # with n.name as poi_name, collect(f.id) as footnodes, collect(r.distance) as distances
-            # with poi_name, footnodes, distances, apoc.coll.indexOf(distances,min(distances)) as min_index 
-            # with poi_name, footnodes[min_index] as footnode, distances[min_index] as dist
-            # match (rj:FootNode {id: footnode}), (poi:OSMWay:POI {name: poi_name}) 
-            # return collect(rj.id) as osm_id, collect([rj.lat, rj.lon]) as gps_coordinates, collect(poi.name) as name
-            # """
-            # result = session.run(query)
-            # ways = result.values()[0]
-
             query = """
             MATCH (f:FootNode)<-[r:NEAR]-(n:OSMNode:POI)-[:TAGS]-(t:Tag) 
             where n.name is not null and 
