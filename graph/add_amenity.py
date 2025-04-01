@@ -91,14 +91,14 @@ class Amenity:
         with conn.driver.session() as session:
             result = session.run("""
                                 MATCH (n:OSMNode)
-                                return min(id(n))
+                                return toInteger(min(id(n)))
                                 """)
-            min_id = result.values()[0]
+            min_id = result.values()[0][0]
             result = session.run("""
                                 MATCH (n:OSMNode)
-                                return max(id(n))
+                                return toInteger(max(id(n)))
                                 """)
-            max_id = result.values()[0]
+            max_id = result.values()[0][0]
 
             limit_max=min_id+1000
 
@@ -112,7 +112,7 @@ class Amenity:
                                         CALL spatial.addNodes('spatial_osmnode', osmnodes) 
                                         YIELD count 
                                         RETURN count
-                                    """,%(min_id, limit_max))
+                                    """%(min_id, limit_max))
                 min_id+=1000
                 limit_max+=1000
 
@@ -272,7 +272,7 @@ def main(args=None):
     print("Generated spatial layer")
     
     res = amenity.import_nodes_into_spatial_layer(neo4jconn)
-    print("Nodes imported in the spatial layer: " + str(res[0]))
+    print("OSMNodes imported in the spatial layer")
     
     amenity.set_index(neo4jconn)
     print("Index set")

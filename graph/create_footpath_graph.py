@@ -65,7 +65,7 @@ class FootPathGraph:
                                 """)
             return result.values()
 
-    def set_edge_geometry(conn, graph):
+    def set_edge_geometry(self, conn):
         with conn.driver.session() as session:
             result = session.run("""CALL apoc.periodic.iterate(
                                     "MATCH (a:FootNode)-[r:ROUTE]->(b:FootNode) where a.lat is not null and b.lat is not null return a.lat as lat_a, a.lon as lon_a, b.lat as lat_b, b.lon as lon_b, r",
@@ -74,7 +74,7 @@ class FootPathGraph:
                                     )
                                     YIELD batches, total
                                     RETURN batches, total;""")
-        return result.values()
+            return result.values()
     
     def set_index(self, conn):
         with conn.driver.session() as session:
@@ -91,15 +91,15 @@ class FootPathGraph:
             result = session.run("""
                                 MATCH (n:FootNode)
                                 where n.is_pedestrian_grafmove='yes'
-                                return min(id(n))
+                                return toInteger(min(id(n)))
                                 """)
-            min_id = result.values()[0]
+            min_id = result.values()[0][0]
             result = session.run("""
                                 MATCH (n:FootNode)
                                 where n.is_pedestrian_grafmove='yes'
-                                return max(id(n))
+                                return toInteger(max(id(n)))
                                 """)
-            max_id = result.values()[0]
+            max_id = result.values()[0][0]
 
             limit_max=min_id+1000
 
@@ -203,7 +203,7 @@ def main(args=None):
     
     neo4jconn.generate_spatial_layer('spatial_footnode')
     
-    graph = FootPathGraph()
+    aph = FootPathGraph()
     graph.create_graph(neo4jconn, options.file_name)
     print("Graph created")
     
@@ -218,21 +218,21 @@ def main(args=None):
     
     graph.set_index(neo4jconn)
     print("Index set")
-
+    
     cc_num, ccomponents = graph.find_connected_components(neo4jconn)
     print("Number of connected components: " + str(cc_num))
     print("Top 5 connected components sorted by number of nodes:")
     print("ComponentId\tNumber of nodes")
     for comp in ccomponents:
         print(str(comp[0]) + "\t\t" + str(comp[1]))
-
+    
     first_componentId = ccomponents[0][0]
     
     graph.set_is_pedestrian(neo4jconn, first_componentId)
     print("Set is_pedestrian_grafmove set")
 
     graph.import_nodes_in_spatial_layer(neo4jconn)
-    print("Imported nodes in spatial layer")
+    print("FootNodes imported in spatial layer")
     
     graph.set_edge_geometry(neo4jconn)
     print("Set edge geometry")

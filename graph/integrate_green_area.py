@@ -153,7 +153,7 @@ def main(args=None):
                 query += f"""
                 node(poly:\"{poly.strip()}\");
                 """
-                if(len(query)+len(end_query) > 20000):
+                if(len(query)+len(end_query) > 2000):
                     query += end_query
                     queries.append(query)
                     query = start_query
