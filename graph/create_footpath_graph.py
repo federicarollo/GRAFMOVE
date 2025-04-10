@@ -150,11 +150,13 @@ class FootPathGraph:
 
     def set_is_pedestrian(self, conn, compId):
         with conn.driver.session() as session:
-                result = session.run("""
-                                    match (n:FootNode)
-                                    with n, case when n.componentId=%s then 'yes' else 'no' end as value
-                                    set n.is_pedestrian_grafmove=value"""%(compId))
-        
+                result = session.run(""" CALL apoc.periodic.iterate(
+                                    "match (n:FootNode) return n, case when n.componentId=%s then 'yes' else 'no' end as value",
+                                    "set n.is_pedestrian_grafmove=value", 
+                                    {batchSize:1000, iterateList:true}
+                                    )
+                                    YIELD batches, total
+                                    RETURN batches, total;"""%(compId))
 
 
 def add_options():
@@ -192,16 +194,16 @@ def main(args=None):
     path = neo4jconn.get_path()[0][0] + '/' + neo4jconn.get_import_folder_name()[0][0] + '/' + options.file_name
     print(path)
     
-    # G = ox.graph_from_point((options.lat, options.lon),
-    #                         dist=int(options.dist),
-    #                         dist_type='bbox',
-    #                         simplify=False,
-    #                         network_type='all',
-    #                         retain_all=True
-    #                         )
-    # ox.save_graphml(G, path)
+    G = ox.graph_from_point((options.lat, options.lon),
+                            dist=int(options.dist),
+                            dist_type='bbox',
+                            simplify=False,
+                            network_type='all',
+                            retain_all=True
+                            )
+    ox.save_graphml(G, path)
     
-    # neo4jconn.generate_spatial_layer('spatial_footnode')
+    neo4jconn.generate_spatial_layer('spatial_footnode')
     
     graph = FootPathGraph()
     graph.create_graph(neo4jconn, options.file_name)
