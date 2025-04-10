@@ -192,18 +192,18 @@ def main(args=None):
     path = neo4jconn.get_path()[0][0] + '/' + neo4jconn.get_import_folder_name()[0][0] + '/' + options.file_name
     print(path)
     
-    G = ox.graph_from_point((options.lat, options.lon),
-                            dist=int(options.dist),
-                            dist_type='bbox',
-                            simplify=False,
-                            network_type='all',
-                            retain_all=True
-                            )
-    ox.save_graphml(G, path)
+    # G = ox.graph_from_point((options.lat, options.lon),
+    #                         dist=int(options.dist),
+    #                         dist_type='bbox',
+    #                         simplify=False,
+    #                         network_type='all',
+    #                         retain_all=True
+    #                         )
+    # ox.save_graphml(G, path)
     
-    neo4jconn.generate_spatial_layer('spatial_footnode')
+    # neo4jconn.generate_spatial_layer('spatial_footnode')
     
-    aph = FootPathGraph()
+    graph = FootPathGraph()
     graph.create_graph(neo4jconn, options.file_name)
     print("Graph created")
     
