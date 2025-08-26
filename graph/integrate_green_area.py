@@ -21,7 +21,7 @@ class GreenArea:
         with conn.driver.session() as session:
 
             query = """CALL apoc.periodic.iterate(
-            "MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) return r1, r2, r",
+            "MATCH (r1:RouteNode)-[r:ROUTE]-(r2:RouteNode) return r1, r2, r",
             "set r.green_area = 0", 
             {batchSize:1000, iterateList:true}
             )
@@ -30,7 +30,7 @@ class GreenArea:
             session.run(query)
 
             query = """CALL apoc.periodic.iterate(
-            "MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) where r1.green_area = 'yes' or r2.green_area = 'yes' return r1, r2, r",
+            "MATCH (r1:RouteNode)-[r:ROUTE]-(r2:RouteNode) where r1.green_area = 'yes' or r2.green_area = 'yes' return r1, r2, r",
             "set r.green_area = 50", 
             {batchSize:1000, iterateList:true}
             )
@@ -39,7 +39,7 @@ class GreenArea:
             session.run(query)
 
             query = """CALL apoc.periodic.iterate(
-            "MATCH (r1:FootNode)-[r:ROUTE]-(r2:FootNode) where r1.green_area = 'yes' and r2.green_area = 'yes' return r1, r2, r",
+            "MATCH (r1:RouteNode)-[r:ROUTE]-(r2:RouteNode) where r1.green_area = 'yes' and r2.green_area = 'yes' return r1, r2, r",
             "set r.green_area = 100", 
             {batchSize:1000, iterateList:true}
             )
@@ -64,7 +64,7 @@ class GreenArea:
             WITH $footnodes_list AS footnodes_list
             CALL apoc.periodic.iterate(
               "UNWIND $footnodes_list AS f
-               MATCH (n:FootNode)
+               MATCH (n:RouteNode)
                WHERE n.id = toString(f)
                RETURN n",
               "SET n.green_area = 'yes'",
@@ -164,7 +164,10 @@ def main(args=None):
         queries.append(query)
     print("Number of queries to perform: " + str(len(queries)))
     
+    count=0
     for query in queries:
+        count+=1
+        print(count)
         result = api.query(query)
         print("Number of nodes retrieved by the query: " + str(len(result.nodes)))
         for node in result.nodes:

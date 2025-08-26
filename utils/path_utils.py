@@ -4,14 +4,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from tqdm import tqdm
 from ast import operator
 from neo4j import GraphDatabase
-import overpy
-import json
+# import overpy
+# import json
 import argparse
 import folium as fo
-import os
 import time
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 from utils.db_utils import Neo4jConnection
 from utils.select_amenity import SelectAmenities
 import logging
@@ -118,7 +117,7 @@ def main(args=None):
     if len(coordinates[0][0]) == 0:
             print('No path')
     else:
-        fo.PolyLine(coordinates[0][0], color="green", weight=5).add_to(m)
+        fo.PolyLine(coordinates[0][0], color="green", weight=3).add_to(m)
         m.save(options.map_filename)
 
     

@@ -21,7 +21,7 @@ class FootPathGraph:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                   "MATCH (n) RETURN n",
-                                  "SET n:FootNode", 
+                                  "SET n:RouteNode", 
                                   {batchSize:1000, iterateList:true}
                                 )
                                 YIELD batches, total
@@ -41,7 +41,7 @@ class FootPathGraph:
                                   n.lon = tofloat(n.x), 
                                   n.latitude = tofloat(n.y), 
                                   n.longitude = tofloat(n.x), 
-                                  n.geometry='POINT(' + tofloat(n.y) + ' ' + tofloat(n.x) +')'", 
+                                  n.geometry='POINT(' + tofloat(n.x) + ' ' + tofloat(n.y) +')'", 
                                   {batchSize:1000, iterateList:true}
                                 )
                                 YIELD batches, total
@@ -56,7 +56,7 @@ class FootPathGraph:
         with conn.driver.session() as session:            
             result = session.run("""
                                     CALL apoc.periodic.iterate(
-                                    "MATCH (n1:FootNode)-[r:ROUTE]-(n2:FootNode) RETURN r, n1, n2",
+                                    "MATCH (n1:RouteNode)-[r:ROUTE]-(n2:RouteNode) RETURN r, n1, n2",
                                     "SET r.distance=point.distance(n1.location, n2.location)", 
                                     {batchSize:1000, iterateList:true}
                                     )
@@ -68,7 +68,8 @@ class FootPathGraph:
     def set_edge_geometry(self, conn):
         with conn.driver.session() as session:
             result = session.run("""CALL apoc.periodic.iterate(
-                                    "MATCH (a:FootNode)-[r:ROUTE]->(b:FootNode) where a.lat is not null and b.lat is not null return a.lat as lat_a, a.lon as lon_a, b.lat as lat_b, b.lon as lon_b, r",
+                                    "MATCH (a:RouteNode)-[r:ROUTE]->(b:RouteNode) where a.lat is not null and b.lat is not null 
+                                    return a.lat as lat_a, a.lon as lon_a, b.lat as lat_b, b.lon as lon_b, r",
                                     "set r.geometry='LINESTRING(' + lon_a + ' ' + lat_a + ', ' + lon_b + ' ' + lat_b + ')'", 
                                     {batchSize:1000, iterateList:true}
                                     )
@@ -79,24 +80,25 @@ class FootPathGraph:
     def set_index(self, conn):
         with conn.driver.session() as session:
             result = session.run("""
-                                    CREATE INDEX footnode_id_index FOR (n:FootNode) ON (n.id)
+                                    CREATE INDEX osmnode_id_index FOR (n:RouteNode) ON (n.id)
                                 """)
             result = session.run("""
-                                    CREATE POINT INDEX footnode_location_index FOR (n:FootNode) ON (n.location)
+                                    CREATE POINT INDEX osmnode_location_index FOR (n:RouteNode) ON (n.location)
                                 """)
             return result.values()
      
     def import_nodes_in_spatial_layer(self, conn):
         with conn.driver.session() as session:
             result = session.run("""
-                                MATCH (n:FootNode)
-                                where n.is_pedestrian_grafmove='yes'
+                                MATCH (n:RouteNode)
+                                where n.pedestrian_allowed_grafmove='yes' or n.cyclist_allowed_grafmove='yes'
                                 return toInteger(min(id(n)))
                                 """)
             min_id = result.values()[0][0]
+            
             result = session.run("""
-                                MATCH (n:FootNode)
-                                where n.is_pedestrian_grafmove='yes'
+                                MATCH (n:RouteNode)
+                                where n.pedestrian_allowed_grafmove='yes' or n.cyclist_allowed_grafmove='yes'
                                 return toInteger(max(id(n)))
                                 """)
             max_id = result.values()[0][0]
@@ -106,57 +108,141 @@ class FootPathGraph:
             while min_id <= max_id:
                 
                 result = session.run("""
-                                        match (n:FootNode)
+                                        match (n:RouteNode)
                                         where n.location is not null
-                                        and n.is_pedestrian_grafmove='yes'
+                                        and (n.pedestrian_allowed_grafmove='yes' or n.cyclist_allowed_grafmove='yes')
                                         and id(n)>=%s and id(n)<%s
-                                        with collect(n) as footnodes
-                                        CALL spatial.addNodes('spatial_footnode', footnodes) 
+                                        with collect(n) as nodes
+                                        CALL spatial.addNodes('spatial_footbikenode', nodes) 
                                         YIELD count 
                                         RETURN count"""%(min_id, limit_max))
                 min_id+=1000
                 limit_max+=1000
 
-            return result.values()
+            print(result.values())
+            
 
     def find_connected_components(self, conn):
         with conn.driver.session() as session:
-                result = session.run("""
-                                    call gds.graph.project.cypher(
-                                    'filtered_graph',
-                                    'match (n:FootNode) return id(n) as id',
-                                    'match (m)-[r:ROUTE]-(n) where 
-                                    not r.highway in ["motorway", "motorway_link", "motorway_junction", 
-                                    "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", 
-                                    "busway", "bus_guideway", "bus_stop", 
-                                    "escape", "raceway", "corridor", "services", "emergency_bay", "proposed", "construction"]
-                                    return id(n) as source, type(r) as type, id(m) as target') """)
-                                    
-                result = session.run("""
-                                    CALL gds.wcc.write('filtered_graph', { writeProperty: 'componentId' })
-                                    YIELD nodePropertiesWritten, componentCount;""")
-                print(result)
-                conn_comp_num = result.values()[0][1]
-                
-                result = session.run("""
-                                    MATCH (n:FootNode)
-                                    WHERE n.componentId IS NOT NULL
-                                    RETURN n.componentId AS componentId, count(n) AS nodeCount
-                                    ORDER BY nodeCount DESC
-                                    limit 5""")
-                conn_comps = result.values()
-                
-                return conn_comp_num, conn_comps
+            
+            conn.drop_projection("filtered_graph")
+            
+            result = session.run("""
+                                call gds.graph.project.cypher(
+                                'filtered_graph',
+                                'match (n:RouteNode) return id(n) as id',
+                                'match (m)-[r:ROUTE]->(n) where 
+                                not r.highway in ["motorway", "motorway_link", "motorway_junction", 
+                                "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", 
+                                "busway", "bus_guideway", "bus_stop", 
+                                "escape", "raceway", "corridor", "services", "emergency_bay", "proposed", "construction"]
+                                return id(n) as source, type(r) as type, id(m) as target') """)
+                                
+            result = session.run("""
+                                CALL gds.wcc.write('filtered_graph', { writeProperty: 'componentId' })
+                                YIELD nodePropertiesWritten, componentCount;""")
+            print(result)
+            conn_comp_num = result.values()[0][1]
+            
+            result = session.run("""
+                                MATCH (n:RouteNode)
+                                WHERE n.componentId IS NOT NULL
+                                RETURN n.componentId AS componentId, count(n) AS nodeCount
+                                ORDER BY nodeCount DESC
+                                limit 5""")
+            conn_comps = result.values()
+            
+            return conn_comp_num, conn_comps
 
-    def set_is_pedestrian(self, conn, compId):
+    def set_foot_and_bike(self, conn, compId):
         with conn.driver.session() as session:
-                result = session.run(""" CALL apoc.periodic.iterate(
-                                    "match (n:FootNode) return n, case when n.componentId=%s then 'yes' else 'no' end as value",
-                                    "set n.is_pedestrian_grafmove=value", 
+            
+            result = session.run("""CALL apoc.periodic.iterate(
+                                "match (n:RouteNode) return n, case when n.componentId=%s then 'yes' else 'no' end as value",
+                                "set n.pedestrian_allowed_grafmove=value, n.cyclist_allowed_grafmove=value", 
+                                {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;"""%(compId))
+        
+            result = session.run("""CALL apoc.periodic.iterate(
+                                "match (n:RouteNode) where n.pedestrian_allowed_grafmove='yes' return n",
+                                "set n:FootNode", 
+                                {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;""")
+        
+            result = session.run("""CALL apoc.periodic.iterate(
+                                "match (n:RouteNode) where n.cyclist_allowed_grafmove='yes' return n",
+                                "set n:BikeNode", 
+                                {batchSize:1000, iterateList:true}
+                                )
+                                YIELD batches, total
+                                RETURN batches, total;""")
+                                    
+    def classify_roads(self, conn):
+        with conn.driver.session() as session:
+            
+                result = session.run("""CALL apoc.periodic.iterate(
+                                    "match (:FootNode)-[r:ROUTE]-(:FootNode) return r, 
+                                    case 
+                                    when r.highway in ['pedestrian', 'footway', 'steps'] then 1
+                                    when r.highway='living_street' and r.foot='yes' and r.segregated='yes' then 1
+                                    when r.highway='path' and r.foot='yes' and r.segregated='yes' then 1
+                                    when r.highway='track' and r.foot='yes' and r.segregated='yes' then 1
+                                    when r.foot='designated' then 1
+                                    when r.footway='sidewalk' then 1
+                                    when r.sidewalk in ['left', 'right', 'both', 'yes', 'lane', 'separate'] then 1
+                                    when r.foot='yes' then 2
+                                    when r.highway='footway' and r.bicycle='yes' then 2
+                                    when r.bicycle='designated' and r.segregated='no' then 2
+                                    when r.highway in ['residential', 'unclassified', 'path', 'track', 'service', 'living_street'] then 2
+                                    when r.highway='living_street' and r.foot='yes' and r.segregated='no' then 2
+                                    when r.highway='path' and r.foot='yes' and r.segregated='no' then 2
+                                    when r.highway='track' and r.foot='yes' and r.segregated='no' then 2
+                                    when toInteger(r.maxspeed)<=30 then 2
+                                    when toInteger(r.maxspeed)>30 and toInteger(r.maxspeed)<=50 then 3
+                                    when toInteger(r.maxspeed)>50 then 4
+                                    else 5
+                                    end as class",
+                                    "set r.foot_class=class", 
                                     {batchSize:1000, iterateList:true}
                                     )
                                     YIELD batches, total
-                                    RETURN batches, total;"""%(compId))
+                                    RETURN batches, total;""")
+                                    
+                                    
+                result = session.run("""CALL apoc.periodic.iterate(
+                                    "match (:BikeNode)-[r:ROUTE]-(:BikeNode) return r, 
+                                    case 
+                                    when r.highway='cycleway' then 1
+                                    when r.cycleway='track' then 1
+                                    when r.cycleway_right='track' then 1
+                                    when r.cycleway_left='track' then 1
+                                    when r.cycleway_both='track' then 1
+                                    when r.bicycle='use_sidepath' then 1
+                                    when r.bicycle='designated' and r.segregated='yes' then 1
+                                    when r.cycleway='lane' then 2
+                                    when r.cycleway_left='lane' then 2
+                                    when r.cycleway_right='lane' then 2
+                                    when r.cycleway_both='lane' then 2
+                                    when r.cycleway='share_busway' then 2
+                                    when r.cycleway_left='share_busway' then 2
+                                    when r.cycleway_right='share_busway' then 2
+                                    when r.highway='footway' and r.bicycle='yes' then 2
+                                    when r.highway in ['residential', 'unclassified', 'path', 'track', 'service', 'living_street'] then 2
+                                    when r.bicycle='designated' and r.segregated='no' then 2
+                                    when toInteger(r.maxspeed)<=30 then 2
+                                    when toInteger(r.maxspeed)>30 and toInteger(r.maxspeed)<=50 then 3
+                                    when toInteger(r.maxspeed)>50 then 4
+                                    else 5
+                                    end as class",
+                                    "set r.bike_class=class", 
+                                    {batchSize:1000, iterateList:true}
+                                    )
+                                    YIELD batches, total
+                                    RETURN batches, total;""")
 
 
 def add_options():
@@ -203,8 +289,8 @@ def main(args=None):
                             )
     ox.save_graphml(G, path)
     
-    neo4jconn.generate_spatial_layer('spatial_footnode')
-    
+    neo4jconn.generate_spatial_layer('spatial_footbikenode')
+     
     graph = FootPathGraph()
     graph.create_graph(neo4jconn, options.file_name)
     print("Graph created")
@@ -230,8 +316,11 @@ def main(args=None):
     
     first_componentId = ccomponents[0][0]
     
-    graph.set_is_pedestrian(neo4jconn, first_componentId)
+    graph.set_foot_and_bike(neo4jconn, first_componentId)
     print("Set is_pedestrian_grafmove set")
+    
+    graph.classify_roads(neo4jconn)
+    print("Roads classified")
 
     graph.import_nodes_in_spatial_layer(neo4jconn)
     print("FootNodes imported in spatial layer")

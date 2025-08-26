@@ -2,12 +2,11 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from tqdm import tqdm
-from ast import operator
+# from ast import operator
 from neo4j import GraphDatabase
-import overpy
-import json
+# import overpy
+# import json
 import argparse
-import folium as fo
 import time
 import numpy as np
 import pandas as pd

@@ -120,15 +120,15 @@ class Amenity:
             
 
     def connect_amenity(self, conn):
-        """Connect the POIs to the nearest FootNodes in the graph."""
+        """Connect the POIs to the nearest RouteNodes in the graph."""
         with conn.driver.session() as session:
             result = session.run("""
                                 CALL apoc.periodic.iterate(
                                     "MATCH (p:OSMNode) RETURN p",
-                                    "CALL spatial.withinDistance('spatial_footnode', p.location, 0.1) YIELD node, distance
+                                    "CALL spatial.withinDistance('spatial_footbikenode', p.location, 0.2) YIELD node, distance
                                     with p, collect(node) as nodes, collect(distance) as distances 
-                                with p, nodes[0] as nearbyFootNode, distances[0] as nearDistance
-                                     MERGE (p)-[r:NEAR]->(nearbyFootNode)
+                                with p, nodes[0] as nearbyRouteNode, distances[0] as nearDistance
+                                     MERGE (p)-[r:NEAR]->(nearbyRouteNode)
                                      ON CREATE SET r.distance = nearDistance", 
                                     {batchSize:500, iterateList:true, parallel:false}
                                 )
@@ -274,8 +274,8 @@ def main(args=None):
     res = amenity.import_nodes_into_spatial_layer(neo4jconn)
     print("OSMNodes imported in the spatial layer")
     
-    amenity.set_index(neo4jconn)
-    print("Index set")
+    # amenity.set_index(neo4jconn)
+    # print("Index set")
 
     amenity.connect_amenity(neo4jconn)
     print("Amenity connected")

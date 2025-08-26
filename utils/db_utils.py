@@ -22,13 +22,13 @@ class Neo4jConnection:
     def drop_projection(self, projection_name):
         with self.driver.session() as session:
             query = f"""
-            CALL gds.graph.list() YIELD name
+            CALL gds.graph.list() YIELD graphName as name
             WHERE name = '{projection_name}'
             RETURN name
             """
             result = session.run(query)
             if result.single():
-                drop_query = f"CALL gds.graph.drop('{graph_name}')"
+                drop_query = f"CALL gds.graph.drop('{projection_name}')"
                 session.run(drop_query)
 
     def drop_all_projections(self):
@@ -45,9 +45,29 @@ class Neo4jConnection:
         with self.driver.session() as session:
             query = f"""
             unwind '{nodes}' as node 
-            match (n:FootNode{id: node}) return collect([n.lat,n.lon])"""%(nodes)
+            match (n:RouteNode{id: node}) return collect([n.lat,n.lon])"""%(nodes)
             result = session.run(query)
             return result.values()
+
+    def get_edges_endpoints(self):
+        with self.driver.session() as session:
+            query = """
+            MATCH (s:RouteNode)-[r:ROUTE]->(d:RouteNode)
+            RETURN s.id AS source, d.id AS destination, 
+            s.lon AS source_lon, s.lat AS source_lat, 
+            d.lon AS destination_lon, d.lat AS destination_lat
+            """
+            result = session.run(query)
+            return result.values()
+
+    def get_extreme_lon_lat(self):
+        with self.driver.session() as session:
+            query = """
+            MATCH (n:RouteNode)
+            RETURN min(n.lon) as min_lon, max(n.lon) as max_lon, min(n.lat) as min_lat, max(n.lat) as max_lat
+            """
+            result = session.run(query)
+            return result.values()[0]
 
     def get_path(self):
         with self.driver.session() as session:
